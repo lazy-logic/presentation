@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dompell App - Navigation</title>
+  <style>
+    :root { --brand:#0055B8; --ink:#0f172a; --muted:#64748b; --bg:#f8fafc; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif; margin: 0; background: var(--bg); color: var(--ink); }
+    header { background: linear-gradient(135deg, #1A1A1A 0%, var(--brand) 100%); color: #fff; padding: 24px; }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    p { margin: 0; color: #e2e8f0; }
+    main { max-width: 1100px; margin: 24px auto; padding: 0 16px 40px; }
+    .controls { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; }
+    input[type="text"] { padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; width: 360px; }
+    button { padding: 10px 14px; border: 0; background: var(--brand); color: #fff; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    button:hover { filter: brightness(1.05); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
+    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; }
+    .path { font-weight: 700; color: var(--brand); }
+    .desc { color: var(--muted); font-size: 12px; margin-top: 4px; }
+    a { color: var(--brand); text-decoration: none; font-weight: 600; }
+    a:hover { text-decoration: underline; }
+    .section-title { margin: 24px 0 8px; font-size: 18px; font-weight: 800; color: #0f172a; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dompell App - Navigation</h1>
+    <p>Quick links to all registered UI routes. Update base URL if your dev server runs on a different host/port.</p>
+  </header>
+  <main>
+    <div class="controls">
+      <label for="base">Base URL:</label>
+      <input id="base" type="text" value="http://localhost:8001" />
+      <button onclick="setBaseToCurrent()">Use Current Origin</button>
+    </div>
+
+    <div id="routes" class="grid"></div>
+  </main>
+
+  <script>
+    const routes = [
+      ['/', 'Home'],
+      ['/login', 'Login'],
+      ['/signup', 'Signup (redirects)'],
+      ['/register', 'Register (role redirect)'],
+      ['/reset-password', 'Reset Password'],
+      ['/user-registration-1', 'User Registration 1'],
+      ['/user-registration-2', 'User Registration 2'],
+      ['/forgot-password', 'Forgot Password'],
+      ['/account-verification', 'Account Verification'],
+      ['/search', 'Search'],
+      ['/jobs', 'Jobs'],
+      ['/dashboard', 'Role-based Dashboard Router'],
+      ['/admin/dashboard', 'Admin Dashboard'],
+      ['/candidates/dashboard', 'Candidates Dashboard'],
+      ['/employers/dashboard', 'Employers Dashboard (modern)'],
+      ['/institutions/dashboard', 'Institutions Dashboard'],
+      ['/about', 'About'],
+      ['/contact', 'Contact'],
+      ['/admin/users', 'Admin Users'],
+      ['/employer/dashboard', 'Employer Dashboard (classic)'],
+      ['/employer/post-job', 'Employer Post Job'],
+      ['/employer/job-posting', 'Employer Job Posting'],
+      ['/employer/trainee-directory', 'Employer Trainee Directory'],
+      ['/employer/pricing', 'Employer Pricing'],
+      ['/employer/onboarding/profile', 'Employer Onboarding: Profile'],
+      ['/employer/onboarding/roles', 'Employer Onboarding: Roles'],
+      ['/help', 'Help'],
+      ['/help-and-support', 'Help & Support'],
+      ['/how-it-works', 'How It Works'],
+      ['/institution/dashboard', 'Institution Dashboard'],
+      ['/institution/program-listing', 'Institution Program Listing'],
+      ['/institution/programs', 'Institution Programs'],
+      ['/institution/program/create', 'Institution Program Create'],
+      ['/institution/onboarding/profile', 'Institution Onboarding: Profile'],
+      ['/institution/settings', 'Institution Settings'],
+      ['/application-tracking', 'Application Tracking'],
+      ['/messages', 'Messages'],
+      ['/settings/notifications', 'Notifications Settings'],
+      ['/profile', 'User Profile'],
+      ['/organizations', 'Organizations'],
+      ['/training-programs', 'Training Programs (Directory)'],
+      ['/file-upload', 'File Upload'],
+      ['/user-directory', 'User Directory'],
+      ['/training-program-directory', 'Training Program Directory (Alt)'],
+      ['/training-program-application', 'Training Program Application'],
+      ['/detailed-training-program-view', 'Detailed Training Program View'],
+      ['/detailed-company-view', 'Detailed Company View'],
+      ['/post-training-program', 'Post Training Program'],
+      ['/interview-booking-scheduling', 'Interview Booking & Scheduling'],
+      ['/notification-center', 'Notification Center'],
+      ['/in-app-messaging-interface', 'In-App Messaging Interface'],
+      ['/immersion-experience-feedback', 'Immersion Experience Feedback'],
+      ['/immersion-management-tracking', 'Immersion Management Tracking'],
+      ['/edit-staff-details', 'Edit Staff Details'],
+      ['/admin-onboarding', 'Admin Onboarding'],
+      ['/email-template-system', 'Email Template System'],
+      ['/user-settings-profile-management', 'User Settings & Profile Management'],
+      ['/employer/browse-candidates', 'Employer Browse Candidates'],
+      ['/employer/candidates', 'Employer Candidates Management'],
+      ['/institution/analytics', 'Institution Analytics'],
+      ['/institution/students', 'Institution Students'],
+      ['/institutions/programs', 'Institutions Programs'],
+      ['/candidates/success-stories', 'Candidates Success Stories'],
+      ['/candidates/browse', 'Candidates Browse'],
+      ['/trainee-onboarding-availability', 'Trainee Onboarding: Availability'],
+      ['/trainee-onboarding-portfolio', 'Trainee Onboarding: Portfolio'],
+      ['/trainee/documents', 'Trainee Documents'],
+      ['/application-submission-confirmation', 'Application Submission Confirmation']
+    ];
+
+    function setBaseToCurrent() {
+      const here = window.location.origin;
+      document.getElementById('base').value = here;
+      render();
+    }
+
+    function render() {
+      const base = document.getElementById('base').value.replace(/\/$/, '');
+      const grid = document.getElementById('routes');
+      grid.innerHTML = '';
+      routes.forEach(([path, label]) => {
+        const url = base + path;
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="path">${path}</div>
+          <div class="desc">${label}</div>
+          <div style="margin-top:8px;"><a href="${url}" target="_blank" rel="noopener">Open</a></div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    render();
+  </script>
+</body>
+</html>

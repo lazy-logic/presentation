@@ -1,12 +1,14 @@
 """
-Institution Dashboard - Classic Professional Design
-Clean, traditional layout with brand colors and professional styling
+Modern Institution Dashboard for Dompell Africa
+Complete redesign with modern UI, API integration, and analytics
 """
 
 from nicegui import ui, app
 from app.services.auth_utils import get_current_user, is_authenticated, logout
+from app.services.api_service import ApiService
 import json
 from pathlib import Path
+from datetime import datetime
 
 def modern_institution_dashboard():
     """Classic professional institution dashboard with brand colors."""
@@ -18,10 +20,19 @@ def modern_institution_dashboard():
         return
     
     user = get_current_user()
+    user_id = user.get('id')
+    
+    # Initialize API service
+    api_service = ApiService()
+    # Set auth token from session
+    token = app.storage.user.get('access_token')
+    if token:
+        api_service.set_auth_token(token)
     
     # Dashboard state - initialized for each session
     state = {
         'programs': [],
+        'organization': {},
         'stats': {
             'active_programs': 0,
             'total_trainees': 0,
@@ -32,47 +43,142 @@ def modern_institution_dashboard():
         'active_section': 'overview'
     }
     
-    def load_dashboard_data():
-        """Loads dashboard data from local storage or uses sample data."""
+    def load_organization_data():
+        """Load organization profile from API."""
         try:
-            storage_path = Path('storage') / 'institution_programs.json'
-            if storage_path.exists():
-                with open(storage_path, 'r') as f:
-                    data = json.load(f)
-                    state['programs'] = data.get('programs', [])
+            # Try to get all organizations and find user's org
+            response = api_service.get_all_organizations()
+            print(f"[INSTITUTION_DASH] Organization API Response: {response.status_code}")
+            
+            if response.ok and response.content:
+                data = response.json()
+                orgs = data.get('data', [])
+                # Find organization for current user
+                user_org = next((org for org in orgs if org.get('userId') == user_id), None)
+                if user_org:
+                    state['organization'] = user_org
+                    print(f"[INSTITUTION_DASH] Loaded organization: {user_org.get('name')}")
+                else:
+                    print(f"[INSTITUTION_DASH] No organization found for user")
+                    state['organization'] = {
+                        'name': user.get('name', 'Institution'),
+                        'description': 'Professional training institution',
+                        'website': '',
+                        'location': '',
+                        '_demo': True
+                    }
             else:
+                print(f"[INSTITUTION_DASH] Failed to load organization, using demo")
+                state['organization'] = {
+                    'name': user.get('name', 'Institution'),
+                    'description': 'Professional training institution',
+                    'website': '',
+                    'location': '',
+                    '_demo': True
+                }
+        except Exception as e:
+            print(f"[INSTITUTION_DASH] Error loading organization: {e}")
+            state['organization'] = {
+                'name': user.get('name', 'Institution'),
+                '_demo': True
+            }
+    
+    def load_dashboard_data():
+        """Loads dashboard data from API with demo fallback."""
+        print(f"[INSTITUTION_DASH] Loading data for user: {user_id}")
+        
+        # Load organization first
+        load_organization_data()
+        
+        try:
+            # Try to load programs from API
+            response = api_service.get_new_programs(user_id)
+            print(f"[INSTITUTION_DASH] API Response status: {response.status_code}")
+            
+            if response.ok and response.content:
+                data = response.json()
+                api_programs = data.get('data', [])
+                print(f"[INSTITUTION_DASH] Loaded {len(api_programs)} programs from API")
+                state['programs'] = api_programs
+            else:
+                print(f"[INSTITUTION_DASH] API call failed, using demo data")
+                # Fallback to demo data
                 state['programs'] = [
                     {
-                        'id': '1',
+                        'id': 'demo-1',
                         'programName': 'Full Stack Web Development Bootcamp',
                         'programStatus': 'Active',
                         'duration': '16 weeks',
-                        'enrolledCount': 38
+                        'enrolledCount': 38,
+                        'capacity': 50,
+                        'startDate': '2025-01-15',
+                        'endDate': '2025-05-15',
+                        'description': 'Comprehensive bootcamp covering frontend and backend development',
+                        '_demo': True
                     },
                     {
-                        'id': '2',
+                        'id': 'demo-2',
                         'programName': 'AI & Machine Learning Fundamentals',
                         'programStatus': 'Active',
                         'duration': '12 weeks',
-                        'enrolledCount': 45
+                        'enrolledCount': 45,
+                        'capacity': 60,
+                        'startDate': '2025-02-01',
+                        'endDate': '2025-04-30',
+                        'description': 'Introduction to AI and ML concepts with hands-on projects',
+                        '_demo': True
                     },
                     {
-                        'id': '3',
+                        'id': 'demo-3',
                         'programName': 'Data Science Bootcamp',
                         'programStatus': 'Pending',
                         'duration': '10 weeks',
-                        'enrolledCount': 0
+                        'enrolledCount': 0,
+                        'capacity': 40,
+                        'startDate': '2025-03-01',
+                        'endDate': '2025-05-15',
+                        'description': 'Learn data analysis, visualization, and statistical modeling',
+                        '_demo': True
+                    },
+                    {
+                        'id': 'demo-4',
+                        'programName': 'UI/UX Design Masterclass',
+                        'programStatus': 'Active',
+                        'duration': '8 weeks',
+                        'enrolledCount': 28,
+                        'capacity': 35,
+                        'startDate': '2025-01-20',
+                        'endDate': '2025-03-20',
+                        'description': 'Master user interface and experience design principles',
+                        '_demo': True
+                    },
+                    {
+                        'id': 'demo-5',
+                        'programName': 'Python Programming Intensive',
+                        'programStatus': 'Upcoming',
+                        'duration': '6 weeks',
+                        'enrolledCount': 15,
+                        'capacity': 30,
+                        'startDate': '2025-04-01',
+                        'endDate': '2025-05-15',
+                        'description': 'Intensive Python programming from basics to advanced',
+                        '_demo': True
                     }
                 ]
             
-            # Calculate stats
+            # Calculate stats from loaded programs
             state['stats']['active_programs'] = len([p for p in state['programs'] if p.get('programStatus') == 'Active'])
             state['stats']['total_trainees'] = sum(p.get('enrolledCount', 0) for p in state['programs'])
-            state['stats']['pending_applications'] = 15
-            state['stats']['completion_rate'] = 85
+            state['stats']['pending_applications'] = 15  # TODO: Get from API when available
+            state['stats']['completion_rate'] = 85  # TODO: Calculate from API data
+            
+            print(f"[INSTITUTION_DASH] Stats calculated: {state['stats']}")
             
         except Exception as e:
-            print(f"[DEBUG] Error loading dashboard data: {e}")
+            print(f"[INSTITUTION_DASH] Error loading dashboard data: {e}")
+            import traceback
+            traceback.print_exc()
+            # Use demo data on error
             state['programs'] = []
             state['stats'] = {
                 'active_programs': 0,
@@ -454,10 +560,19 @@ def modern_institution_dashboard():
                 # User Profile Card
                 with ui.card().style('background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 16px; border-radius: 12px; backdrop-filter: blur(10px);'):
                     with ui.row().classes('items-center gap-3'):
-                        with ui.element('div').style('width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #0055B8 0%, #003d82 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0, 85, 184, 0.3);'):
-                            ui.label(user.get('name', 'I')[0].upper()).style('color: white; font-weight: 700; font-size: 16px;')
+                        # Use organization logo if available, otherwise initials
+                        org_name = state['organization'].get('name', user.get('name', 'Institution'))
+                        org_logo = state['organization'].get('logoUrl', '')
+                        
+                        if org_logo:
+                            with ui.element('div').style('width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2); box-shadow: 0 2px 8px rgba(0, 85, 184, 0.3);'):
+                                ui.image(org_logo).style('width: 100%; height: 100%; object-fit: cover;')
+                        else:
+                            with ui.element('div').style('width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #0055B8 0%, #003d82 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0, 85, 184, 0.3);'):
+                                ui.label(org_name[0].upper()).style('color: white; font-weight: 700; font-size: 16px;')
+                        
                         with ui.column().classes('gap-0 flex-1'):
-                            ui.label(user.get('name', 'Institution')).style('font-size: 14px; font-weight: 700; color: #ffffff; line-height: 1;')
+                            ui.label(org_name).style('font-size: 14px; font-weight: 700; color: #ffffff; line-height: 1;')
                             ui.label(user.get('email', '')).style('font-size: 11px; color: #94a3b8; margin-top: 4px;')
             
             ui.separator().style('margin: 20px 0; background: rgba(255, 255, 255, 0.1);')
@@ -1325,12 +1440,16 @@ def modern_institution_dashboard():
                                     ui.label(f'{percentage}%').style(f'color: {color}; font-size: 16px; font-weight: 700; min-width: 50px; text-align: right;')
         
         def render_create_program():
-            """Create new training program form."""
+            """Create new training program form with modern wizard-style interface."""
             from datetime import datetime, timedelta
             
-            with ui.element('div').classes('section-header'):
-                ui.label('Create New Training Program').classes('section-title')
-                ui.label('Fill in the details below to create a new training program').classes('section-subtitle')
+            # Modern header with gradient
+            with ui.element('div').style('background: linear-gradient(135deg, #0055B8 0%, #003d82 100%); padding: 32px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0, 85, 184, 0.2);'):
+                with ui.row().classes('items-center justify-between w-full'):
+                    with ui.column().classes('gap-2'):
+                        ui.label('Create New Training Program').style('font-size: 28px; font-weight: 800; color: white;')
+                        ui.label('Build a comprehensive program to empower your trainees').style('font-size: 14px; color: rgba(255,255,255,0.9);')
+                    ui.icon('school', size='48px').style('color: rgba(255,255,255,0.3);')
             
             # Sample data
             next_month = (datetime.now() + timedelta(days=30)).strftime('%Y-%m-%d')
@@ -1352,64 +1471,167 @@ def modern_institution_dashboard():
                 'maxEnrollment': '30'
             }
             
-            # Two column layout for better space usage
-            with ui.row().classes('w-full gap-6').style('margin-top: 24px;'):
-                # Left Column
-                with ui.card().classes('pro-card flex-1').style('padding: 16px;'):
-                    with ui.column().style('gap: 20px;'):
-                        # Basic Information
-                        ui.label('Basic Information').style('font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 8px;')
+            # Modern card-based form layout
+            with ui.column().classes('w-full').style('gap: 20px;'):
+                # Section 1: Basic Information
+                with ui.card().classes('pro-card').style('padding: 24px; border-left: 4px solid #0055B8;'):
+                    with ui.row().classes('items-center gap-3').style('margin-bottom: 20px;'):
+                        with ui.element('div').style('width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #0055B8 0%, #003d82 100%); display: flex; align-items: center; justify-content: center;'):
+                            ui.label('1').style('color: white; font-weight: 800; font-size: 18px;')
+                        with ui.column().classes('gap-0'):
+                            ui.label('Basic Information').style('font-size: 18px; font-weight: 700; color: #0f172a;')
+                            ui.label('Essential details about your program').style('font-size: 12px; color: #64748b;')
+                    
+                    with ui.column().style('gap: 16px;'):
+                        ui.input('Program Title *', placeholder='e.g., Advanced Data Science Bootcamp').classes('w-full').props('outlined').bind_value(form_data, 'title').style('font-size: 14px;')
+                        ui.textarea('Program Description *', placeholder='Provide a comprehensive description of what trainees will learn and achieve...').classes('w-full').props('outlined rows=4').bind_value(form_data, 'description')
                         
-                        ui.input('Program Title *', placeholder='e.g., Advanced Data Science Bootcamp').classes('w-full').props('outlined dense').bind_value(form_data, 'title')
-                        ui.textarea('Program Description *', placeholder='Provide a detailed description...').classes('w-full').props('outlined dense rows=3').bind_value(form_data, 'description')
+                        with ui.row().classes('w-full gap-4'):
+                            with ui.column().classes('flex-1'):
+                                ui.label('Program Type *').style('font-size: 13px; font-weight: 600; color: #0f172a; margin-bottom: 4px;')
+                                ui.select(['Bootcamp', 'Certificate Course', 'Diploma', 'Workshop', 'Degree Program', 'Short Course'], value='Bootcamp').classes('w-full').props('outlined').bind_value(form_data, 'programType')
+                            with ui.column().classes('flex-1'):
+                                ui.label('Delivery Mode *').style('font-size: 13px; font-weight: 600; color: #0f172a; margin-bottom: 4px;')
+                                ui.select(['Online', 'In-Person', 'Hybrid'], value='Online').classes('w-full').props('outlined').bind_value(form_data, 'deliveryMode')
                         
-                        with ui.row().classes('w-full gap-3'):
-                            ui.select(['Bootcamp', 'Certificate Course', 'Diploma', 'Workshop', 'Degree Program', 'Short Course'], label='Program Type', value='Bootcamp').classes('flex-1').props('outlined dense').bind_value(form_data, 'programType')
-                            ui.select(['Online', 'In-Person', 'Hybrid'], label='Delivery Mode', value='Online').classes('flex-1').props('outlined dense').bind_value(form_data, 'deliveryMode')
-                        
-                        ui.separator().style('margin: 8px 0;')
-                        
-                        # Program Details
-                        ui.label('Program Details').style('font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 8px;')
-                        
-                        with ui.column().style('gap: 4px;'):
-                            ui.label('Key Learning Outcomes *').style('font-size: 13px; font-weight: 600; color: #0f172a;')
-                            ui.label('Enter each outcome on a new line').style('font-size: 11px; color: #64748b;')
-                            ui.textarea(placeholder='• Outcome 1\n• Outcome 2\n• Outcome 3').classes('w-full').props('outlined dense rows=3').bind_value(form_data, 'keyLearningOutcomes')
-                        
-                        with ui.row().classes('w-full gap-3'):
-                            ui.input('Duration *', placeholder='e.g., 6 weeks').classes('flex-1').props('outlined dense').bind_value(form_data, 'duration')
-                            ui.input('Max Enrollment', placeholder='30').classes('flex-1').props('outlined dense type=number').bind_value(form_data, 'maxEnrollment')
-                        
-                        with ui.column().style('gap: 4px;'):
-                            ui.label('Associated Certifications').style('font-size: 13px; font-weight: 600; color: #0f172a;')
-                            ui.textarea(placeholder='One per line').classes('w-full').props('outlined dense rows=2').bind_value(form_data, 'associatedCertifications')
+                        with ui.row().classes('w-full gap-4'):
+                            with ui.column().classes('flex-1'):
+                                ui.label('Duration *').style('font-size: 13px; font-weight: 600; color: #0f172a; margin-bottom: 4px;')
+                                ui.input(placeholder='e.g., 12 weeks, 3 months').classes('w-full').props('outlined').bind_value(form_data, 'duration')
+                            with ui.column().classes('flex-1'):
+                                ui.label('Maximum Enrollment').style('font-size: 13px; font-weight: 600; color: #0f172a; margin-bottom: 4px;')
+                                ui.input(placeholder='e.g., 30').classes('w-full').props('outlined type=number').bind_value(form_data, 'maxEnrollment')
                 
-                # Right Column
-                with ui.card().classes('pro-card flex-1').style('padding: 16px;'):
-                    with ui.column().style('gap: 20px;'):
-                        # Timeline
-                        ui.label('Timeline').style('font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 8px;')
+                # Section 2: Program Content
+                with ui.card().classes('pro-card').style('padding: 24px; border-left: 4px solid #10b981;'):
+                    with ui.row().classes('items-center gap-3').style('margin-bottom: 20px;'):
+                        with ui.element('div').style('width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); display: flex; align-items: center; justify-content: center;'):
+                            ui.label('2').style('color: white; font-weight: 800; font-size: 18px;')
+                        with ui.column().classes('gap-0'):
+                            ui.label('Program Content & Outcomes').style('font-size: 18px; font-weight: 700; color: #0f172a;')
+                            ui.label('What will trainees learn and achieve?').style('font-size: 12px; color: #64748b;')
+                    
+                    with ui.column().style('gap: 16px;'):
+                        with ui.column().style('gap: 6px;'):
+                            ui.label('Key Learning Outcomes *').style('font-size: 13px; font-weight: 600; color: #0f172a;')
+                            ui.label('📝 Enter each outcome on a new line (these become the skills taught)').style('font-size: 11px; color: #64748b; padding: 8px 12px; background: #f8fafc; border-radius: 6px;')
+                            ui.textarea(placeholder='• Master Python programming fundamentals\n• Build machine learning models\n• Deploy applications to cloud platforms').classes('w-full').props('outlined rows=5').bind_value(form_data, 'keyLearningOutcomes')
                         
-                        with ui.row().classes('w-full gap-3'):
-                            ui.input('Start Date *').classes('flex-1').props('type=date outlined dense').bind_value(form_data, 'startDate')
-                            ui.input('End Date *').classes('flex-1').props('type=date outlined dense').bind_value(form_data, 'endDate')
+                        with ui.column().style('gap: 6px;'):
+                            ui.label('Certifications & Benefits').style('font-size: 13px; font-weight: 600; color: #0f172a;')
+                            ui.label('🏆 What will trainees receive upon completion?').style('font-size: 11px; color: #64748b; padding: 8px 12px; background: #f8fafc; border-radius: 6px;')
+                            ui.textarea(placeholder='• Certificate of Completion\n• Industry-recognized credentials\n• Job placement assistance\n• Lifetime access to course materials').classes('w-full').props('outlined rows=4').bind_value(form_data, 'associatedCertifications')
+                
+                # Section 3: Schedule & Timeline
+                with ui.card().classes('pro-card').style('padding: 24px; border-left: 4px solid #f59e0b;'):
+                    with ui.row().classes('items-center gap-3').style('margin-bottom: 20px;'):
+                        with ui.element('div').style('width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); display: flex; align-items: center; justify-content: center;'):
+                            ui.label('3').style('color: white; font-weight: 800; font-size: 18px;')
+                        with ui.column().classes('gap-0'):
+                            ui.label('Schedule & Timeline').style('font-size: 18px; font-weight: 700; color: #0f172a;')
+                            ui.label('When does the program run?').style('font-size: 12px; color: #64748b;')
+                    
+                    with ui.row().classes('w-full gap-4'):
+                        with ui.column().classes('flex-1'):
+                            ui.label('Start Date *').style('font-size: 13px; font-weight: 600; color: #0f172a; margin-bottom: 4px;')
+                            ui.input().classes('w-full').props('type=date outlined').bind_value(form_data, 'startDate')
+                        with ui.column().classes('flex-1'):
+                            ui.label('End Date *').style('font-size: 13px; font-weight: 600; color: #0f172a; margin-bottom: 4px;')
+                            ui.input().classes('w-full').props('type=date outlined').bind_value(form_data, 'endDate')
+                
+                # Section 4: Application Requirements
+                with ui.card().classes('pro-card').style('padding: 24px; border-left: 4px solid #8b5cf6;'):
+                    with ui.row().classes('items-center gap-3').style('margin-bottom: 20px;'):
+                        with ui.element('div').style('width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); display: flex; align-items: center; justify-content: center;'):
+                            ui.label('4').style('color: white; font-weight: 800; font-size: 18px;')
+                        with ui.column().classes('gap-0'):
+                            ui.label('Application Requirements').style('font-size: 18px; font-weight: 700; color: #0f172a;')
+                            ui.label('Who can apply and how?').style('font-size: 12px; color: #64748b;')
+                    
+                    with ui.column().style('gap: 16px;'):
+                        with ui.column().style('gap: 6px;'):
+                            ui.label('Eligibility Criteria').style('font-size: 13px; font-weight: 600; color: #0f172a;')
+                            ui.label('✅ What are the requirements to join this program?').style('font-size: 11px; color: #64748b; padding: 8px 12px; background: #f8fafc; border-radius: 6px;')
+                            ui.textarea(placeholder='• Basic computer literacy\n• High school diploma or equivalent\n• Passion for learning\n• No prior experience required').classes('w-full').props('outlined rows=4').bind_value(form_data, 'eligibilityCriteria')
                         
-                        ui.separator().style('margin: 8px 0;')
+                        with ui.column().style('gap: 6px;'):
+                            ui.label('Application Process').style('font-size: 13px; font-weight: 600; color: #0f172a;')
+                            ui.label('📋 How do applicants apply?').style('font-size: 11px; color: #64748b; padding: 8px 12px; background: #f8fafc; border-radius: 6px;')
+                            ui.textarea(placeholder='1. Complete online application form\n2. Submit required documents\n3. Attend orientation session\n4. Receive acceptance notification').classes('w-full').props('outlined rows=4').bind_value(form_data, 'applicationProcess')
                         
-                        # Application Information
-                        ui.label('Application Information').style('font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 8px;')
+                        ui.label('Brochure URL (Optional)').style('font-size: 13px; font-weight: 600; color: #0f172a; margin-top: 8px;')
+                        ui.input(placeholder='https://example.com/program-brochure.pdf').classes('w-full').props('outlined').bind_value(form_data, 'brochureUrl')
                         
-                        ui.textarea('Eligibility Criteria', placeholder='Requirements for applicants...').classes('w-full').props('outlined dense rows=3').bind_value(form_data, 'eligibilityCriteria')
-                        ui.textarea('Application Process', placeholder='How to apply...').classes('w-full').props('outlined dense rows=3').bind_value(form_data, 'applicationProcess')
-                        ui.input('Brochure URL (Optional)', placeholder='https://example.com/brochure.pdf').classes('w-full').props('outlined dense').bind_value(form_data, 'brochureUrl')
+                # Action Buttons - Sticky footer style
+                with ui.card().classes('pro-card').style('padding: 20px; background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); border-top: 2px solid #e2e8f0; position: sticky; bottom: 0; z-index: 10;'):
+                    with ui.row().classes('w-full items-center justify-between'):
+                        with ui.row().classes('items-center gap-2'):
+                            ui.icon('info', size='20px').style('color: #64748b;')
+                            ui.label('All fields marked with * are required').style('font-size: 12px; color: #64748b; font-weight: 500;')
                         
-                        ui.separator().style('margin: 8px 0;')
-                        
-                        # Action Buttons
-                        with ui.row().classes('w-full justify-end gap-3'):
-                            ui.button('Cancel', on_click=lambda: (content_container.clear(), render_content('overview'))).props('outline').style('color: #64748b; padding: 8px 20px;')
-                            ui.button('Create Program', icon='add_circle', on_click=lambda: ui.notify('Program created successfully!', type='positive')).classes('pro-btn-primary').style('padding: 8px 20px;')
+                        with ui.row().classes('gap-3'):
+                            ui.button('Cancel', icon='close', on_click=lambda: (content_container.clear(), render_content('programs'))).props('outline size=lg').style('color: #64748b; border-color: #e2e8f0; padding: 12px 32px; font-weight: 600;')
+                            
+                            def handle_create_program():
+                                """Handle program creation via API."""
+                                try:
+                                    # Validate required fields
+                                    if not form_data['title'] or not form_data['description']:
+                                        ui.notify('Please fill in all required fields', type='warning')
+                                        return
+                                    
+                                    # Prepare program data for API
+                                    program_payload = {
+                                        'title': form_data['title'],
+                                        'description': form_data['description'],
+                                        'duration': form_data['duration'],
+                                        'startDate': form_data['startDate'],
+                                        'endDate': form_data['endDate'],
+                                        'programType': form_data['programType'],
+                                        'deliveryMode': form_data['deliveryMode'],
+                                        'capacity': int(form_data['maxEnrollment']) if form_data['maxEnrollment'] else 30,
+                                        'requirements': [line.strip() for line in form_data['eligibilityCriteria'].split('\n') if line.strip()],
+                                        'skills': [line.strip() for line in form_data['keyLearningOutcomes'].split('\n') if line.strip()],
+                                        'benefits': [line.strip() for line in form_data['associatedCertifications'].split('\n') if line.strip()],
+                                    }
+                                    
+                                    # Add optional fields
+                                    if form_data['brochureUrl']:
+                                        program_payload['brochureUrl'] = form_data['brochureUrl']
+                                    if form_data['applicationProcess']:
+                                        program_payload['applicationProcess'] = form_data['applicationProcess']
+                                    
+                                    print(f"[CREATE_PROGRAM] Submitting program: {program_payload}")
+                                    
+                                    # Call API
+                                    response = api_service.create_training_program(user_id, program_payload)
+                                    
+                                    if response.ok:
+                                        ui.notify('Program created successfully!', type='positive')
+                                        print(f"[CREATE_PROGRAM] Success: {response.json()}")
+                                        # Reload programs
+                                        load_dashboard_data()
+                                        # Navigate back to programs view
+                                        content_container.clear()
+                                        with content_container:
+                                            render_content('programs')
+                                    else:
+                                        error_msg = 'Failed to create program'
+                                        try:
+                                            error_data = response.json()
+                                            error_msg = error_data.get('message', error_msg)
+                                        except:
+                                            pass
+                                        ui.notify(error_msg, type='negative')
+                                        print(f"[CREATE_PROGRAM] Error: {response.status_code} - {response.text}")
+                                        
+                                except Exception as e:
+                                    ui.notify(f'Error creating program: {str(e)}', type='negative')
+                                    print(f"[CREATE_PROGRAM] Exception: {e}")
+                                    import traceback
+                                    traceback.print_exc()
+                            
+                            ui.button('Create Program', icon='rocket_launch', on_click=handle_create_program).props('size=lg').style('background: linear-gradient(135deg, #0055B8 0%, #003d82 100%); color: white; padding: 12px 40px; font-weight: 700; font-size: 14px; box-shadow: 0 4px 12px rgba(0, 85, 184, 0.3);')
         
         def render_students():
             """Students directory and management."""

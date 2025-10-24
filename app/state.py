@@ -53,16 +53,19 @@ app_state = AppState()
 auth_events = Events()
 
 @auth_events.on('login')
-def handle_login(user_data: dict, token: str):
+def handle_login(user_data: dict, token: str, refresh_token: str = None):
     """Handle user login state."""
     app.storage.user.update({
         'is_authenticated': True,
         'user_data': user_data,
         'token': token,
+        'refresh_token': refresh_token,
     })
     # Set the token in the API service for subsequent requests
     from .services.api_service import api_service
     api_service.set_auth_token(token)
+    if refresh_token:
+        api_service.set_refresh_token(refresh_token)
     print(f"User {user_data.get('email')} logged in.")
 
 @auth_events.on('logout')
@@ -71,6 +74,7 @@ def handle_logout():
     # Clear the token from the API service
     from .services.api_service import api_service
     api_service.clear_auth_token()
+    api_service.refresh_token = None
     
     # Clear user session
     app.storage.user.clear()

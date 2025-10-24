@@ -62,6 +62,7 @@ from app.pages.institutions.institution_students import institution_students_pag
 from app.pages.institutions.institution_settings import institution_settings_page
 from app.pages.candidates.candidates_success_stories import candidates_success_stories_page
 from app.pages.candidates.candidates_browse import candidates_browse_page
+from app.pages.shared.api_test import api_test_page
 
 # Communication & Interviews
 from app.pages.shared.interview_booking_scheduling import interview_booking_scheduling_page
@@ -749,6 +750,11 @@ def candidates_browse():
     header('/candidates/browse')
     candidates_browse_page()
     footer()
+
+@ui.page('/api-test')
+def api_test():
+    """API endpoints test page."""
+    api_test_page()
 
 if __name__ in {"__main__", "__mp_main__"}:
     # Run the application

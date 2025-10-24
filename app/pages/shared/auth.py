@@ -173,11 +173,12 @@ def _create_login_form():
                 response_data = response.json()
                 print(f"[LOGIN] Response data: {response_data}")
                 
-                # Extract data from nested structure: data.user and data.token.accessToken
+                # Extract data from nested structure: data.user and data.token.{accessToken, refreshToken}
                 data = response_data.get('data', {})
                 user_data = data.get('user', {})
                 token_data = data.get('token', {})
                 token = token_data.get('accessToken')
+                refresh_token = token_data.get('refreshToken')
                 
                 print(f"[LOGIN] User data: {user_data}")
                 print(f"[LOGIN] Token: {token[:50] if token else 'None'}...")
@@ -187,8 +188,8 @@ def _create_login_form():
                 if state["remember_me"]:
                     app.storage.user['remember_me'] = True
                 
-                # Use the auth_events to signal a successful login
-                auth_events.trigger('login', user_data, token)
+                # Use the auth_events to signal a successful login (include refresh token)
+                auth_events.trigger('login', user_data, token, refresh_token)
                 
                 await asyncio.sleep(1)
                 # Redirect based on role after login

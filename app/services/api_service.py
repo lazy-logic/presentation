@@ -6,6 +6,8 @@ Updated based on API documentation: https://dompell-server.onrender.com/api-docs
 
 import requests
 from typing import Dict, Any, Optional, List
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from app.config import API_BASE_URL
 
 class ApiService:
@@ -15,32 +17,90 @@ class ApiService:
         self.base_url = API_BASE_URL
         self.session = requests.Session()
         self.token = None  # Initialize token attribute
+        self.refresh_token = None
+        self._configure_session()
 
-    def _make_request(self, method: str, endpoint: str, data: Optional[Dict] = None, 
+    def _configure_session(self):
+        retry = Retry(
+            total=3,
+            connect=3,
+            read=3,
+            backoff_factor=0.5,
+            status_forcelist=[429, 500, 502, 503, 504],
+            allowed_methods=frozenset(["GET", "POST", "PATCH", "DELETE"]),
+            raise_on_status=False,
+        )
+        adapter = HTTPAdapter(max_retries=retry, pool_connections=10, pool_maxsize=10)
+        self.session.mount('https://', adapter)
+        self.session.mount('http://', adapter)
+        # Prefer keep-alive; we will force close on retry if needed
+        self.session.headers.update({'Connection': 'keep-alive'})
+
+    def _make_request(self, method: str, endpoint: str, data: Optional[Any] = None, 
                      params: Optional[Dict] = None, headers: Optional[Dict] = None,
-                     files: Optional[Dict] = None) -> requests.Response:
+                     files: Optional[Dict] = None, timeout: float = 30.0) -> requests.Response:
         """Make a generic API request with error handling."""
         url = f"{self.base_url}{endpoint}"
         
-        try:
+        def _do_request(hdrs: Optional[Dict]):
             if method.upper() == 'GET':
-                response = self.session.get(url, params=params, headers=headers)
+                return self.session.get(url, params=params, headers=hdrs, timeout=timeout)
             elif method.upper() == 'POST':
                 if files:
-                    response = self.session.post(url, data=data, files=files, headers=headers)
+                    return self.session.post(url, data=data, files=files, headers=hdrs, timeout=timeout)
                 else:
-                    response = self.session.post(url, json=data, headers=headers)
+                    return self.session.post(url, json=data, headers=hdrs, timeout=timeout)
             elif method.upper() == 'PATCH':
-                response = self.session.patch(url, json=data, headers=headers)
+                return self.session.patch(url, json=data, headers=hdrs, timeout=timeout)
             elif method.upper() == 'DELETE':
-                response = self.session.delete(url, headers=headers)
+                return self.session.delete(url, headers=hdrs, timeout=timeout)
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
-                
-            return response
+
+        try:
+            resp = _do_request(headers)
+            # Auto-refresh if unauthorized/forbidden and we have a refresh token
+            if resp is not None and resp.status_code in (401, 403) and self.refresh_token and endpoint != '/auth/refresh-token':
+                try:
+                    rt_resp = self.refresh_access_token(self.refresh_token)
+                    if rt_resp.ok:
+                        try:
+                            payload = rt_resp.json() if rt_resp.content else {}
+                        except Exception:
+                            payload = {}
+                        # Handle possible shapes
+                        new_access = (
+                            (payload.get('data') or {}).get('accessToken')
+                            or payload.get('accessToken')
+                            or ((payload.get('token') or {}).get('accessToken'))
+                        )
+                        if new_access:
+                            self.set_auth_token(new_access)
+                            # Retry original request once, without overriding Authorization header
+                            retry_headers = dict(headers or {})
+                            retry_headers.pop('Authorization', None)
+                            return _do_request(retry_headers)
+                except Exception as _:
+                    pass
+            return resp
         except requests.RequestException as e:
-            print(f"API request error: {e}")
-            raise
+            # Fallback: reinitialize session and retry once with Connection: close
+            print(f"[API_SERVICE] Request error: {e}. Retrying once with a fresh session and Connection: close")
+            try:
+                self.session.close()
+            except Exception:
+                pass
+            self.session = requests.Session()
+            self._configure_session()
+            if self.token:
+                self.session.headers.update({'Authorization': f'Bearer {self.token}'})
+            retry_headers = dict(headers or {})
+            retry_headers['Connection'] = 'close'
+            try:
+                return _do_request(retry_headers)
+            except requests.RequestException as e2:
+                print(f"[API_SERVICE] Retry failed: {e2}")
+                raise
 
     # ===== AUTHENTICATION ENDPOINTS =====
     
@@ -147,7 +207,7 @@ class ApiService:
         """
         return self._make_request('POST', '/auth/resend-email', data={"email": email})
 
-    def refresh_token(self, refresh_token: str) -> requests.Response:
+    def refresh_access_token(self, refresh_token: str) -> requests.Response:
         """
         Generate a new access token using refresh token.
         
@@ -157,8 +217,7 @@ class ApiService:
         Returns:
             API response with new access token
         """
-        return self._make_request('POST', '/auth/refresh-token', 
-                                data={"refresh_token": refresh_token})
+        return self._make_request('POST', '/auth/refresh-token', data=refresh_token)
 
     # ===== USER ENDPOINTS =====
 
@@ -231,6 +290,102 @@ class ApiService:
         """
         return self._make_request('POST', '/upload', files=file_data, headers=headers)
 
+    # ===== TRAINEE PROFILE ENDPOINTS =====
+
+    def create_trainee_profile(self, user_id: str, form: Dict[str, Any], files: Optional[Dict] = None,
+                               headers: Optional[Dict] = None) -> requests.Response:
+        url = f"/trainee/create/{user_id}"
+        return self._make_request('POST', url, data=form, files=files, headers=headers)
+
+    def list_trainees(self, headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('GET', '/trainee', headers=headers)
+
+    def get_trainee_by_user(self, user_id: str, headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('GET', f"/trainee/{user_id}", headers=headers)
+
+    def delete_trainee(self, trainee_id: str, headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('DELETE', f"/trainee/{trainee_id}", headers=headers)
+
+    # ===== TRAINEE SKILLS ENDPOINTS =====
+
+    def add_skill(self, trainee_profile_id: str, name: str, headers: Optional[Dict] = None) -> requests.Response:
+        payload = {"name": name}
+        return self._make_request('POST', f"/trainee/skill/{trainee_profile_id}", data=payload, headers=headers)
+
+    def update_skill(self, skill_id: str, update_data: Dict[str, Any], headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('PATCH', f"/trainee/skill/{skill_id}", data=update_data, headers=headers)
+
+    def delete_skill(self, skill_id: str, trainee_profile_id: str, headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('DELETE', f"/trainee/skill/{skill_id}/{trainee_profile_id}", headers=headers)
+
+    # ===== TRAINEE EDUCATION ENDPOINTS =====
+
+    def list_education(self, trainee_profile_id: str, headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('GET', f"/trainee/education/{trainee_profile_id}", headers=headers)
+
+    def create_education(self, trainee_profile_id: str, dto: Dict[str, Any], headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('POST', f"/trainee/education/create/{trainee_profile_id}", data=dto, headers=headers)
+
+    def get_education(self, education_id: str, headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('GET', f"/trainee/education/{education_id}", headers=headers)
+
+    def update_education(self, education_id: str, dto: Dict[str, Any], headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('PATCH', f"/trainee/education/{education_id}", data=dto, headers=headers)
+
+    def delete_education(self, education_id: str, headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('DELETE', f"/trainee/education/{education_id}", headers=headers)
+
+    # ===== TRAINEE EXPERIENCE ENDPOINTS =====
+
+    def list_experience(self, trainee_profile_id: str, headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('GET', f"/trainee/experience/{trainee_profile_id}", headers=headers)
+
+    def create_experience(self, trainee_profile_id: str, dto: Dict[str, Any], headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('POST', f"/trainee/experience/create/{trainee_profile_id}", data=dto, headers=headers)
+
+    def get_experience(self, experience_id: str, headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('GET', f"/trainee/experience/{experience_id}", headers=headers)
+
+    def update_experience(self, experience_id: str, dto: Dict[str, Any], headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('PATCH', f"/trainee/experience/{experience_id}", data=dto, headers=headers)
+
+    def delete_experience(self, experience_id: str, headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('DELETE', f"/trainee/experience/{experience_id}", headers=headers)
+
+    # ===== TRAINEE CERTIFICATION ENDPOINTS =====
+
+    def list_certifications(self, trainee_profile_id: str, headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('GET', f"/trainee/certification/{trainee_profile_id}", headers=headers)
+
+    def create_certification(self, trainee_profile_id: str, dto: Dict[str, Any], headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('POST', f"/trainee/certification/create/{trainee_profile_id}", data=dto, headers=headers)
+
+    def get_certification(self, certification_id: str, headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('GET', f"/trainee/certification/{certification_id}", headers=headers)
+
+    def update_certification(self, certification_id: str, dto: Dict[str, Any], headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('PATCH', f"/trainee/certification/{certification_id}", data=dto, headers=headers)
+
+    def delete_certification(self, certification_id: str, headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('DELETE', f"/trainee/certification/{certification_id}", headers=headers)
+
+    # ===== TRAINEE PORTFOLIO ENDPOINTS =====
+
+    def list_portfolio(self, trainee_profile_id: str, headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('GET', f"/trainee/portfolio/{trainee_profile_id}", headers=headers)
+
+    def create_portfolio(self, trainee_profile_id: str, dto: Dict[str, Any], headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('POST', f"/trainee/portfolio/create/{trainee_profile_id}", data=dto, headers=headers)
+
+    def get_portfolio_item(self, portfolio_id: str, headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('GET', f"/trainee/portfolio/{portfolio_id}", headers=headers)
+
+    def update_portfolio_item(self, portfolio_id: str, dto: Dict[str, Any], headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('PATCH', f"/trainee/portfolio/{portfolio_id}", data=dto, headers=headers)
+
+    def delete_portfolio_item(self, portfolio_id: str, headers: Optional[Dict] = None) -> requests.Response:
+        return self._make_request('DELETE', f"/trainee/portfolio/{portfolio_id}", headers=headers)
+
     # ===== ORGANIZATION ENDPOINTS =====
 
     def create_organization(self, user_id: str, org_data: Dict[str, Any], 
@@ -248,6 +403,20 @@ class ApiService:
         """
         return self._make_request('POST', f'/organization/create/{user_id}', 
                                 data=org_data, headers=headers)
+
+    def create_organization_multipart(self, user_id: str, form: Dict[str, Any], files: Optional[Dict] = None,
+                                      headers: Optional[Dict] = None) -> requests.Response:
+        """
+        Create or update an organization profile using multipart/form-data.
+        Use when uploading a logo file in addition to fields.
+        
+        Args:
+            user_id: The user's ID
+            form: Dict of string fields (name, industry, description, website, location, etc.)
+            files: Dict with file tuples, e.g., {'logo': (filename, content_bytes, content_type)}
+            headers: Authorization headers
+        """
+        return self._make_request('POST', f'/organization/create/{user_id}', data=form, files=files, headers=headers)
 
     def get_all_organizations(self, headers: Optional[Dict] = None) -> requests.Response:
         """
@@ -345,7 +514,46 @@ class ApiService:
         Returns:
             API response with upcoming programs list
         """
+        # Try the canonical path with slash first
+        resp = self._make_request('GET', f'/programs/upcoming/{user_id}', headers=headers)
+        try:
+            if resp is not None and 200 <= resp.status_code < 400:
+                return resp
+        except Exception:
+            pass
+        # Fallback to the spec variant missing the slash
         return self._make_request('GET', f'/programs/upcoming{user_id}', headers=headers)
+
+    # ===== EMPLOYER ENDPOINTS =====
+
+    def create_employer_profile(self, user_id: str, form: Dict[str, Any], files: Optional[Dict] = None,
+                                headers: Optional[Dict] = None) -> requests.Response:
+        """
+        Create or update an employer profile.
+        
+        Args:
+            user_id: The user's ID
+            form: Dict with fields (name, industry, description, website, location)
+            files: Optional dict with logo file
+            headers: Authorization headers
+        """
+        return self._make_request('POST', f"/employer/create/{user_id}", data=form, files=files, headers=headers)
+
+    def get_employer(self, employer_id: str, headers: Optional[Dict] = None) -> requests.Response:
+        """Get an employer profile by ID."""
+        return self._make_request('GET', f"/employer/{employer_id}", headers=headers)
+
+    def get_employer_by_user(self, user_id: str, headers: Optional[Dict] = None) -> requests.Response:
+        """Get an employer profile by user ID."""
+        return self._make_request('GET', f"/employer/{user_id}", headers=headers)
+
+    def list_employers(self, headers: Optional[Dict] = None) -> requests.Response:
+        """Get all employers."""
+        return self._make_request('GET', '/employer', headers=headers)
+
+    def delete_employer(self, employer_id: str, headers: Optional[Dict] = None) -> requests.Response:
+        """Delete an employer profile."""
+        return self._make_request('DELETE', f"/employer/{employer_id}", headers=headers)
 
     # ===== UTILITY METHODS =====
 
@@ -359,6 +567,9 @@ class ApiService:
         self.token = token  # Store token
         self.session.headers.update({'Authorization': f'Bearer {token}'})
         print(f"[API_SERVICE] Token set: {token[:20]}...")
+
+    def set_refresh_token(self, refresh_token: str):
+        self.refresh_token = refresh_token
 
     def clear_auth_token(self):
         """Remove the authorization token from session headers."""

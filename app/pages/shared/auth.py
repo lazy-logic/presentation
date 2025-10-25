@@ -36,33 +36,66 @@ def auth_page(initial_tab: str = 'login', role: str = 'candidate'):
                 margin: 0 auto;
             }
 
-            /* Inputs: keep structure, enhance visuals */
+            /* Inputs: keep structure, enhance visuals with more spacing */
             .modern-input {
                 border-radius: 12px;
                 border: 2px solid rgba(0, 85, 184, 0.18);
                 background: rgba(0, 85, 184, 0.03);
                 transition: box-shadow .2s ease, border-color .2s ease;
+                margin-bottom: 32px !important;
+                padding: 18px !important;
+                font-size: 15px !important;
             }
             .modern-input:focus-within {
                 border-color: var(--brand-primary);
                 box-shadow: 0 0 0 4px rgba(0, 85, 184, 0.18);
             }
+            
+            /* Add spacing to input fields */
+            .modern-input .q-field__control {
+                min-height: 60px !important;
+                padding: 0 18px !important;
+            }
+            
+            .modern-input .q-field__native {
+                padding: 18px 0 !important;
+                font-size: 15px !important;
+            }
 
-            /* Stronger specificity to override Quasar defaults */
-            .gradient-btn, .q-btn.gradient-btn {
-                background: var(--brand-primary) !important;
+            /* Stronger specificity to override Quasar defaults - ENFORCE BRAND COLORS */
+            .gradient-btn, .q-btn.gradient-btn, button.gradient-btn {
+                background: #0055B8 !important;
                 color: #ffffff !important;
                 border-radius: 12px !important;
                 border: 0 !important;
                 font-weight: 700 !important;
                 letter-spacing: .2px !important;
                 transition: background .15s ease, box-shadow .2s ease, transform .12s ease !important;
+                min-height: 56px !important;
+                font-size: 16px !important;
+                padding: 16px 32px !important;
             }
             .q-btn.gradient-btn .q-btn__content { color: #ffffff !important; }
-            .gradient-btn:hover, .q-btn.gradient-btn:hover { background: var(--brand-primary-600) !important; box-shadow: 0 8px 20px rgba(0, 85, 184, 0.25) !important; transform: translateY(-1px) !important; }
-            .gradient-btn:active, .q-btn.gradient-btn:active { background: var(--brand-primary-700) !important; box-shadow: 0 4px 12px rgba(0, 85, 184, 0.20) !important; transform: translateY(0) !important; }
-            .gradient-btn:focus, .q-btn.gradient-btn:focus { outline: none !important; box-shadow: 0 0 0 4px rgba(0, 85, 184, 0.18) !important; }
-            .gradient-btn[disabled], .q-btn.gradient-btn[disabled], .q-btn.gradient-btn.q-btn--disabled { opacity: 0.7 !important; filter: grayscale(10%) !important; box-shadow: none !important; cursor: not-allowed !important; }
+            .gradient-btn:hover, .q-btn.gradient-btn:hover, button.gradient-btn:hover { 
+                background: #00479a !important; 
+                box-shadow: 0 8px 20px rgba(0, 85, 184, 0.25) !important; 
+                transform: translateY(-1px) !important; 
+            }
+            .gradient-btn:active, .q-btn.gradient-btn:active, button.gradient-btn:active { 
+                background: #003d82 !important; 
+                box-shadow: 0 4px 12px rgba(0, 85, 184, 0.20) !important; 
+                transform: translateY(0) !important; 
+            }
+            .gradient-btn:focus, .q-btn.gradient-btn:focus, button.gradient-btn:focus { 
+                outline: none !important; 
+                box-shadow: 0 0 0 4px rgba(0, 85, 184, 0.18) !important; 
+            }
+            .gradient-btn[disabled], .q-btn.gradient-btn[disabled], .q-btn.gradient-btn.q-btn--disabled { 
+                opacity: 0.7 !important; 
+                filter: grayscale(10%) !important; 
+                box-shadow: none !important; 
+                cursor: not-allowed !important; 
+            }
 
             /* Tabs aesthetics (active underlines and weight already set) */
             .q-tabs { background: #F8FAFC; border-bottom: 1px solid #E2E8F0; }
@@ -109,6 +142,30 @@ def auth_page(initial_tab: str = 'login', role: str = 'candidate'):
             /* Progress bar on submit */
             .submit-progress { height: 3px; background: linear-gradient(90deg, #0055B8, #10b981); border-radius: 2px; transition: opacity .2s ease; }
 
+            /* Checkbox styling */
+            .auth-checkbox .q-checkbox__inner {
+                width: 20px !important;
+                height: 20px !important;
+                min-width: 20px !important;
+            }
+            .auth-checkbox .q-checkbox__bg {
+                border: 2px solid rgba(0, 85, 184, 0.3) !important;
+                border-radius: 6px !important;
+            }
+            .auth-checkbox .q-checkbox__inner--truthy .q-checkbox__bg {
+                background: #0055B8 !important;
+                border-color: #0055B8 !important;
+            }
+            .auth-checkbox .q-checkbox__label {
+                color: #334155 !important;
+                font-size: 14px !important;
+                font-weight: 500 !important;
+                padding-left: 8px !important;
+            }
+            .auth-checkbox:hover .q-checkbox__bg {
+                border-color: #0055B8 !important;
+            }
+
             /* Responsive split without Tailwind utilities */
             .auth-split { display: flex; flex-direction: column; gap: 2rem; }
             @media (min-width: 900px) { .auth-split { flex-direction: row; } }
@@ -144,7 +201,22 @@ def auth_page(initial_tab: str = 'login', role: str = 'candidate'):
 
 def _create_login_form():
     """Creates the login form."""
-    state = {"email": "", "password": "", "remember_me": False, "is_submitting": False}
+    # Check for prefilled credentials from test login
+    prefill_email = app.storage.user.get('prefill_email', '')
+    prefill_password = app.storage.user.get('prefill_password', '')
+    
+    state = {
+        "email": prefill_email, 
+        "password": prefill_password, 
+        "remember_me": False, 
+        "is_submitting": False
+    }
+    
+    # Clear prefill data after using it
+    if prefill_email:
+        app.storage.user.pop('prefill_email', None)
+        app.storage.user.pop('prefill_password', None)
+        app.storage.user.pop('prefill_role', None)
     
     async def handle_login():
         if state["is_submitting"]: return
@@ -229,10 +301,10 @@ def _create_login_form():
             state["is_submitting"] = False
             submit_button.props('loading=false')
 
-    with ui.column().classes('w-full px-8 py-10 gap-5'):
+    with ui.column().classes('w-full px-8 py-12 gap-6'):
         # Subtle progress bar (visual only)
         progress = ui.element('div').classes('submit-progress').style('opacity: 0;')
-        ui.label('Welcome Back!').classes('text-2xl font-semibold text-gray-800 text-center raleway-font')
+        ui.label('Welcome Back!').classes('text-2xl font-semibold text-gray-800 text-center raleway-font mb-4')
         
         def update_email(value):
             state['email'] = value
@@ -252,16 +324,18 @@ def _create_login_form():
         
         email_input = ui.input(placeholder='Email Address', on_change=lambda e: update_email(e.value))\
             .props('outlined dense').classes('w-full modern-input')
+        email_input.bind_value(state, 'email')
         email_chip = ui.label('').classes('text-xs raleway-font')
         
         password_input = ui.input(placeholder='Password', password=True, password_toggle_button=True, on_change=lambda e: update_password(e.value))\
             .props('outlined dense').classes('w-full modern-input')
+        password_input.bind_value(state, 'password')
 
-        with ui.row().classes('w-full justify-between items-center mt-3'):
-            ui.checkbox('Remember me').bind_value(state, 'remember_me')
-            ui.link('Forgot Password?', '/forgot-password').classes('text-sm text-primary raleway-font')
+        with ui.row().classes('w-full justify-between items-center mt-6'):
+            ui.checkbox('Remember me').bind_value(state, 'remember_me').classes('auth-checkbox')
+            ui.link('Forgot Password?', '/forgot-password').classes('text-sm text-primary raleway-font font-semibold')
         
-        submit_button = ui.button('Log In', on_click=handle_login).classes('w-full h-12 gradient-btn text-white mt-4')
+        submit_button = ui.button('Log In', on_click=handle_login).classes('w-full h-12 gradient-btn text-white mt-6')
         
         with ui.row().classes('w-full justify-center items-center gap-2 mt-8'):
             ui.label("Don't have an account?").classes('text-gray-600 raleway-font')
@@ -421,28 +495,35 @@ def _create_signup_form(role='candidate'):
             state["is_submitting"] = False
             submit_button.props('loading=false')
 
-    with ui.column().classes('w-full px-8 py-10 gap-5'):
+    with ui.column().classes('w-full px-8 py-12 gap-6'):
         # Subtle progress bar (visual only)
         progress = ui.element('div').classes('submit-progress').style('opacity: 0;')
-        ui.label('Create Your Account').classes('text-2xl font-semibold text-gray-800 text-center raleway-font')
+        ui.label('Create Your Account').classes('text-2xl font-semibold text-gray-800 text-center raleway-font mb-4')
 
-        with ui.column().classes('w-full gap-3'):
-            ui.label('I am a:').classes('text-sm font-medium text-gray-700 raleway-font')
-            with ui.tabs().props(f'model-value={role.lower()}').classes('w-full role-tabs') as user_type_tabs:
-                ui.tab('trainee', 'Trainee/Candidate').classes('flex-1 role-tab')
-                ui.tab('employer', 'Employer').classes('flex-1 role-tab')
-                ui.tab('institution', 'Institution').classes('flex-1 role-tab')
-            user_type_tabs.props('active-class="role-active"')
-            
-            def on_role_change(e):
-                role_mapping = {
-                    'trainee': 'TRAINEE', 
-                    'employer': 'EMPLOYER', 
-                    'institution': 'INSTITUTION'
-                }
-                state['role'] = role_mapping.get(e.value, 'TRAINEE')
-            
-            user_type_tabs.on('update:model-value', on_role_change)
+        # Role selector as dropdown
+        def on_role_change(e):
+            role_mapping = {
+                'Trainee/Candidate': 'TRAINEE', 
+                'Employer': 'EMPLOYER', 
+                'Institution': 'INSTITUTION'
+            }
+            state['role'] = role_mapping.get(e.value, 'TRAINEE')
+        
+        # Map initial role to display value
+        role_display_mapping = {
+            'candidate': 'Trainee/Candidate',
+            'trainee': 'Trainee/Candidate', 
+            'employer': 'Employer', 
+            'institution': 'Institution'
+        }
+        initial_role_display = role_display_mapping.get(role.lower(), 'Trainee/Candidate')
+        
+        role_select = ui.select(
+            label='I am a:',
+            options=['Trainee/Candidate', 'Employer', 'Institution'],
+            value=initial_role_display,
+            on_change=on_role_change
+        ).props('outlined dense').classes('w-full modern-input')
 
         def update_name(value):
             state['name'] = value
@@ -512,10 +593,10 @@ def _create_signup_form(role='candidate'):
             .props('outlined dense').classes('w-full modern-input')
         confirm_chip = ui.label('').classes('text-xs raleway-font')
 
-        with ui.row().classes('w-full items-center mt-3'):
-            terms_checkbox = ui.checkbox('I agree to the Terms and Privacy Policy.').bind_value(state, 'terms_agreed')
+        with ui.row().classes('w-full items-start mt-6'):
+            terms_checkbox = ui.checkbox('I agree to the Terms and Privacy Policy').bind_value(state, 'terms_agreed').classes('auth-checkbox')
 
-        submit_button = ui.button('Create Account', on_click=handle_signup).classes('w-full h-12 gradient-btn text-white mt-5')
+        submit_button = ui.button('Create Account', on_click=handle_signup).classes('w-full h-12 gradient-btn text-white mt-6')
         
         with ui.row().classes('w-full justify-center items-center gap-2 mt-8'):
             ui.label("Already have an account?").classes('text-gray-600 raleway-font')

@@ -14,6 +14,7 @@ from nicegui import ui, app
 from app.pages.shared.home import home_page
 from app.pages.shared.about import about_page
 from app.pages.shared.auth import auth_page
+from app.pages.shared.test_login import test_login_page
 from app.pages.shared.jobs import jobs_page
 from app.pages.candidates.redesigned_dashboard import redesigned_candidate_dashboard
 from app.pages.admin.admin_management import admin_management_page
@@ -91,19 +92,28 @@ def index():
     home_page()
     footer()
 
+@ui.page('/test-login')
+def test_login():
+    """Test login page for quick access to different roles."""
+    test_login_page()
+
 @ui.page('/login')
 def login(tab: str = None):
-    """Unified login and registration page."""
+    """Redirect to test login page for easy role selection."""
+    test_login_page()
+
+@ui.page('/auth-form')
+def auth_form(tab: str = None):
+    """Actual login/signup form page."""
     header('/login')
-    # Handle tab parameter from URL (e.g., /login?tab=Sign+Up)
+    # Handle tab parameter from URL (e.g., /auth-form?tab=Sign+Up)
     initial_tab = 'login'  # default
     if tab and 'sign' in tab.lower():
         initial_tab = 'signup'
     
-    print(f"[DEBUG] Login page accessed with tab parameter: {tab}, setting initial_tab to: {initial_tab}")
+    print(f"[DEBUG] Auth form page accessed with tab parameter: {tab}, setting initial_tab to: {initial_tab}")
     auth_page(initial_tab=initial_tab)
     footer()
-
 
 @ui.page('/signup')
 def signup():

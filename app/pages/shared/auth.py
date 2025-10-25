@@ -215,22 +215,8 @@ def _create_login_form():
                 elif role == 'INSTITUTION':
                     ui.navigate.to('/institutions/dashboard')
                 else:  # TRAINEE or default
-                    # Check if trainee profile is complete
-                    trainee_profile = user_data.get('traineeProfile', {})
-                    profile_complete = (
-                        trainee_profile and
-                        trainee_profile.get('phone') and
-                        trainee_profile.get('bio') and
-                        trainee_profile.get('skills') and
-                        len(trainee_profile.get('skills', [])) > 0
-                    )
-                    
-                    if not profile_complete:
-                        # Redirect to onboarding if profile incomplete or None
-                        ui.notify("Please complete your profile", color='info')
-                        ui.navigate.to('/trainee-onboarding-portfolio')
-                    else:
-                        ui.navigate.to('/candidates/dashboard')
+                    # Redirect directly to dashboard (no onboarding required)
+                    ui.navigate.to('/candidates/dashboard')
 
             else:
                 try:

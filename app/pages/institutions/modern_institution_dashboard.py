@@ -218,49 +218,60 @@ def modern_institution_dashboard():
             transform: translateY(-1px);
         }
         
-        /* Metric Cards */
+        /* Metric Cards - Dark Blue Analytics Cards */
         .metric-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-            padding: 12px;
+            background: linear-gradient(135deg, #003d82 0%, #002855 100%);
+            border-radius: 20px;
+            border: 1px solid #004494;
+            padding: 28px;
             margin: 8px 0;
             margin-left: 15px;
             margin-right: 15px;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-                }
+            box-shadow: 0 4px 12px rgba(0, 61, 130, 0.3);
+            color: white;
+        }
         
         .metric-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            right: 0;
-            width: 100px;
-            height: 100px;
-            background: radial-gradient(circle, rgba(0, 85, 184, 0.05) 0%, transparent 70%);
-            border-radius: 50%;
-            transform: translate(30%, -30%);
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 85, 184, 0.2) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
         }
         
         .metric-card:hover {
             border-color: #0055B8 !important;
-            box-shadow: 0 8px 16px rgba(0, 85, 184, 0.12) !important;
+            box-shadow: 0 8px 20px rgba(0, 85, 184, 0.4) !important;
             transform: translateY(-4px);
+        }
+        
+        /* White text for metric cards */
+        .metric-card * {
+            color: white !important;
         }
         
         .metric-value {
             font-size: 20px;
             font-weight: 800;
-            color: #0055B8 !important;
+            color: white !important;
             line-height: 1;
             margin: 6px 0 4px 0;
         }
         
         .metric-label {
             font-size: 10px;
-            color: #64748b;
+            color: rgba(255, 255, 255, 0.8) !important;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -268,7 +279,7 @@ def modern_institution_dashboard():
         
         .metric-trend {
             font-size: 11px;
-            color: #10b981;
+            color: #4ade80 !important;
             font-weight: 600;
             margin-top: 4px;
         }
@@ -278,6 +289,100 @@ def modern_institution_dashboard():
             background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
             border-right: 1px solid #334155;
             height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 64px;
+            width: 280px;
+            z-index: 1001;
+            transition: transform 0.3s ease;
+        }
+        
+        /* Mobile Responsive Styles */
+        @media (max-width: 1023px) {
+            .pro-sidebar {
+                transform: translateX(-100%);
+                box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+            }
+            
+            .pro-sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            
+            .dashboard-main-content {
+                margin-left: 0 !important;
+                padding: 16px !important;
+            }
+            
+            .metric-card {
+                margin: 8px 0 !important;
+            }
+            
+            .metric-value {
+                font-size: 18px !important;
+            }
+            
+            .pro-card {
+                padding: 12px !important;
+            }
+            
+            /* Stack cards vertically on mobile */
+            .grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            /* Mobile hamburger menu button */
+            .mobile-hamburger {
+                display: flex !important;
+                position: fixed;
+                top: 72px;
+                left: 16px;
+                width: 44px;
+                height: 44px;
+                background: #0055B8;
+                border-radius: 8px;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 8px rgba(0, 85, 184, 0.3);
+                z-index: 999;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            
+            .mobile-hamburger:hover {
+                background: #004494;
+                box-shadow: 0 4px 12px rgba(0, 85, 184, 0.4);
+            }
+            
+            .mobile-hamburger .material-icons {
+                color: white;
+                font-size: 24px;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .mobile-hamburger {
+                display: none !important;
+            }
+            
+            .dashboard-main-content {
+                margin-left: 280px;
+            }
+        }
+        
+        /* Mobile overlay */
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 64px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        
+        .mobile-overlay.active {
+            display: block;
         }
         
         /* Dark Navigation */
@@ -554,7 +659,8 @@ def modern_institution_dashboard():
     # Professional Dashboard Layout
     with ui.row().classes('w-full').style('min-height: 100vh; gap: 0; margin: 0; padding-top: 64px;'):
         # Professional Sidebar - positioned between header and footer
-        with ui.column().classes('pro-sidebar').style('width: 260px; padding: 24px 20px; position: fixed; left: 0; top: 64px; bottom: 64px; overflow-y: auto; z-index: 40;'):
+        sidebar = ui.column().classes('pro-sidebar').style('width: 260px; padding: 24px 20px; position: fixed; left: 0; top: 64px; bottom: 64px; overflow-y: auto; z-index: 40;')
+        with sidebar:
             # Brand Section
             with ui.column().classes('mb-8'):
                 # User Profile Card
@@ -579,18 +685,20 @@ def modern_institution_dashboard():
             
             # Navigation Menu
             with ui.column().classes('flex-1').style('gap: 4px;'):
-                # All menu items (now all internal)
                 menu_items = [
                     ('overview', 'dashboard', 'Dashboard'),
                     ('programs', 'school', 'Programs'),
                     ('create_program', 'add_circle', 'Create Program'),
                     ('applications', 'assignment', 'Applications'),
-                    ('students', 'group', 'Students'),
-                    ('analytics', 'bar_chart', 'Analytics'),
+                    ('analytics', 'analytics', 'Analytics'),
                     ('settings', 'settings', 'Settings'),
                 ]
                 
                 menu_buttons = {}
+                
+                # Define close function before menu handlers
+                def close_mobile_menu():
+                    sidebar.classes(remove='mobile-open')
                 
                 def create_menu_handler(section):
                     def handler():
@@ -603,6 +711,8 @@ def modern_institution_dashboard():
                         content_container.clear()
                         with content_container:
                             render_content(section)
+                        # Auto-hide sidebar on mobile after clicking menu item
+                        close_mobile_menu()
                     return handler
                 
                 # Render all menu items
@@ -621,8 +731,19 @@ def modern_institution_dashboard():
                 ui.label('Logout')
         
         # Main Content Area (with left margin to account for fixed sidebar)
-        with ui.column().classes('flex-1').style('background: #f8fafc; padding: 32px 60px 32px 60px; overflow-y: auto; min-height: 100vh; margin-left: 260px;'):
+        with ui.column().classes('flex-1 dashboard-main-content').style('background: #f8fafc; padding: 32px 60px 32px 60px; overflow-y: auto; min-height: 100vh; margin-left: 260px;'):
             content_container = ui.column().style('max-width: 1200px; width: 100%; margin: 0 auto; margin-top: 25px; margin-left: 10px; margin-right: 40px;')
+        
+        # Mobile hamburger menu button (top-left corner)
+        mobile_hamburger = ui.element('div').classes('mobile-hamburger')
+        with mobile_hamburger:
+            ui.icon('menu')
+        
+        # Toggle functionality
+        def toggle_mobile_menu():
+            sidebar.classes(toggle='mobile-open')
+        
+        mobile_hamburger.on('click', toggle_mobile_menu)
         
         def render_content(section):
             """Render content based on active section."""
@@ -649,9 +770,6 @@ def modern_institution_dashboard():
                     with ui.column().classes('gap-1'):
                         ui.label(f'Welcome Back, {user.get("name", "Institution")}!').classes('section-title')
                         ui.label('Here\'s what\'s happening with your institution today').classes('section-subtitle')
-                    with ui.element('div').style('display: flex; gap: 12px;'):
-                        ui.button('Create Program', icon='add_circle', on_click=lambda: ui.navigate.to('/institution/program/create'))\
-                            .classes('pro-btn-primary')
             
             # Metrics Grid
             with ui.element('div').classes('stats-grid'):
@@ -758,24 +876,15 @@ def modern_institution_dashboard():
                         with ui.element('div').classes('empty-icon'):
                             ui.icon('school', size='40px').style('color: #94a3b8;')
                         ui.label('No Programs Yet').style('font-size: 18px; font-weight: 700; color: #64748b; margin-bottom: 8px;')
-                        ui.label('Get started by creating your first training program').style('font-size: 14px; color: #94a3b8; margin-bottom: 20px;')
-                        
-                        ui.button('Create Your First Program', icon='add_circle',
-                                on_click=lambda: ui.navigate.to('/institution/program/create'))\
-                            .classes('pro-btn-primary')
+                        ui.label('Get started by creating your first training program using the sidebar menu').style('font-size: 14px; color: #94a3b8; margin-bottom: 20px;')
         
         def render_programs():
             """Professional programs listing with redesigned table."""
             # Section Header
             with ui.element('div').classes('section-header'):
-                with ui.row().classes('items-center justify-between w-full'):
-                    with ui.column().classes('gap-1'):
-                        ui.label('Training Programs').classes('section-title')
-                        ui.label(f'Manage and oversee all {len(state["programs"])} training programs').classes('section-subtitle')
-                    
-                    ui.button('Create New Program', icon='add_circle',
-                            on_click=lambda: ui.navigate.to('/institution/program/create'))\
-                        .classes('pro-btn-primary')
+                with ui.column().classes('gap-1'):
+                    ui.label('Training Programs').classes('section-title')
+                    ui.label(f'Manage and oversee all {len(state["programs"])} training programs').classes('section-subtitle')
             
             # Programs Stats
             with ui.element('div').classes('stats-grid').style('margin-bottom: 8px;'):

@@ -483,6 +483,8 @@ def header(current_page: str = ''):
                             elif user_role == 'EMPLOYER':
                                 mobile_nav_link('Employer Dashboard', '/employers/dashboard')
                                 mobile_nav_link('Job Postings', '/employer/job-posting')
+                            elif user_role == 'INSTITUTION':
+                                mobile_nav_link('Institution Dashboard', '/institution/dashboard')
                             
                             mobile_nav_link('Profile Settings', '/settings/profile')
                             
@@ -539,6 +541,8 @@ def header(current_page: str = ''):
                             elif user_role == 'EMPLOYER':
                                 ui.menu_item('Employer Dashboard', on_click=lambda: ui.navigate.to('/employers/dashboard'))
                                 ui.menu_item('Job Postings', on_click=lambda: ui.navigate.to('/employer/job-posting'))
+                            elif user_role == 'INSTITUTION':
+                                ui.menu_item('Institution Dashboard', on_click=lambda: ui.navigate.to('/institution/dashboard'))
 
                             ui.menu_item('Profile Settings', on_click=lambda: ui.navigate.to('/settings/profile'))
                             ui.separator()

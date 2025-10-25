@@ -121,13 +121,14 @@ def modern_employer_dashboard():
             scroll-behavior: smooth;
         }
         .dashboard-wrapper { background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%); min-height: 100vh; }
-        .sidebar-modern { background: linear-gradient(180deg, #1A1A1A 0%, #2d2d2d 100%); width: 280px; position: fixed; left: 0; top: 64px; height: calc(100vh - 64px); overflow-y: auto; box-shadow: 4px 0 24px rgba(0,0,0,0.15); z-index: 100; }
+        .sidebar-modern { background: linear-gradient(180deg, #1A1A1A 0%, #2d2d2d 100%); width: 280px; position: fixed; left: 0; top: 64px; height: calc(100vh - 64px); overflow-y: auto; box-shadow: 4px 0 24px rgba(0,0,0,0.15); z-index: 1001; transition: transform 0.3s ease; }
         .user-profile-card { background: rgba(0, 85, 184, 0.1); border: 1px solid rgba(0, 85, 184, 0.3); border-radius: 16px; padding: 20px; margin: 20px; }
         .profile-avatar { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #0055B8 0%, #003d82 100%); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; font-weight: 700; box-shadow: 0 4px 12px rgba(0, 85, 184, 0.3); }
         .nav-item { padding: 14px 24px; margin: 8px 16px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 12px; color: #b0b0b0; font-weight: 500; }
         .nav-item:hover { background: rgba(0, 85, 184, 0.1); color: #0055B8; transform: translateX(4px); }
         .nav-item.active { background: linear-gradient(135deg, #0055B8 0%, #003d82 100%); color: white; box-shadow: 0 4px 16px rgba(0, 85, 184, 0.4); }
-        .main-content { margin-left: 280px; margin-top: 64px; padding: 32px; min-height: calc(100vh - 64px); }
+        .main-content { margin-left: 280px; margin-top: 64px; padding: 32px; min-height: calc(100vh - 64px); transition: margin-left 0.3s ease; }
+        .main-content.sidebar-collapsed { margin-left: 0; }
         .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: 20px; padding: 28px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08); border: 1px solid rgba(255, 255, 255, 0.8); }
         .section-header { font-size: 28px; font-weight: 700; color: #1A1A1A; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
         .section-header::before { content: ''; width: 4px; height: 32px; background: linear-gradient(180deg, #0055B8 0%, #003d82 100%); border-radius: 2px; }
@@ -175,6 +176,61 @@ def modern_employer_dashboard():
         .q-table a:hover, table a:hover { text-decoration: underline !important; }
         .q-table .q-btn, table .q-btn { color: #0055B8 !important; }
         .q-table__bottom, .q-table__separator { border-color: #e2e8f0 !important; }
+        
+        /* Mobile Responsive Styles */
+        @media (max-width: 1023px) {
+            .sidebar-modern {
+                transform: translateX(-100%);
+                box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+            }
+            
+            .sidebar-modern.mobile-open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+                padding: 16px !important;
+            }
+            
+            .glass-card {
+                padding: 16px !important;
+            }
+            
+            /* Mobile hamburger menu button */
+            .mobile-hamburger {
+                display: flex !important;
+                position: fixed;
+                top: 72px;
+                left: 16px;
+                width: 44px;
+                height: 44px;
+                background: #0055B8;
+                border-radius: 8px;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 8px rgba(0, 85, 184, 0.3);
+                z-index: 999;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            
+            .mobile-hamburger:hover {
+                background: #004494;
+                box-shadow: 0 4px 12px rgba(0, 85, 184, 0.4);
+            }
+            
+            .mobile-hamburger .material-icons {
+                color: white;
+                font-size: 24px;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .mobile-hamburger {
+                display: none !important;
+            }
+        }
     </style>
     ''')
     
@@ -200,7 +256,8 @@ def modern_employer_dashboard():
     # Main dashboard wrapper
     with ui.element('div').classes('dashboard-wrapper'):
         # Sidebar
-        with ui.element('div').classes('sidebar-modern'):
+        sidebar = ui.element('div').classes('sidebar-modern')
+        with sidebar:
             # User Profile Card
             with ui.element('div').classes('user-profile-card'):
                 with ui.row().classes('items-center gap-4'):
@@ -226,6 +283,10 @@ def modern_employer_dashboard():
             
             menu_buttons = {}
             
+            # Define close function before menu handlers
+            def close_mobile_menu():
+                sidebar.classes(remove='mobile-open')
+            
             def create_nav_handler(section):
                 def handler():
                     active_section['current'] = section
@@ -235,6 +296,8 @@ def modern_employer_dashboard():
                     content_area.clear()
                     with content_area:
                         render_section(section)
+                    # Auto-hide sidebar on mobile after clicking menu item
+                    close_mobile_menu()
                 return handler
             
             for section, label in menu_items:
@@ -258,6 +321,17 @@ def modern_employer_dashboard():
 
         # Main Content Area
         content_area = ui.column().classes('main-content')
+        
+        # Mobile hamburger menu button (top-left corner)
+        mobile_hamburger = ui.element('div').classes('mobile-hamburger')
+        with mobile_hamburger:
+            ui.icon('menu')
+        
+        # Toggle functionality
+        def toggle_mobile_menu():
+            sidebar.classes(toggle='mobile-open')
+        
+        mobile_hamburger.on('click', toggle_mobile_menu)
         
         def navigate_to_section(section):
             """Navigate to a different section."""

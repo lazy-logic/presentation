@@ -55,15 +55,42 @@ def redesigned_candidate_dashboard():
         
         /* Sidebar */
         .sidebar-modern {
-            background: linear-gradient(180deg, #1A1A1A 0%, #2d2d2d 100%);
-            width: 280px;
             position: fixed;
             left: 0;
             top: 64px;
+            width: 280px;
             height: calc(100vh - 64px);
+            background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
             overflow-y: auto;
-            box-shadow: 4px 0 24px rgba(0,0,0,0.15);
             z-index: 100;
+            transition: width 0.3s ease;
+        }
+        
+        .sidebar-modern.collapsed {
+            width: 80px;
+        }
+        
+        .sidebar-modern.collapsed .user-profile-card {
+            padding: 12px;
+            margin: 12px;
+        }
+        
+        .sidebar-modern.collapsed .user-info,
+        .sidebar-modern.collapsed .nav-item .text-sm {
+            display: none;
+        }
+        
+        .sidebar-modern.collapsed .nav-item {
+            justify-content: center;
+            padding: 14px;
+            margin: 8px;
+        }
+        
+        .sidebar-modern.collapsed .profile-avatar {
+            width: 48px;
+            height: 48px;
+            font-size: 20px;
         }
         
         .sidebar-modern::-webkit-scrollbar {
@@ -112,6 +139,7 @@ def redesigned_candidate_dashboard():
             gap: 12px;
             color: #b0b0b0;
             font-weight: 500;
+            white-space: nowrap;
         }
         
         .nav-item:hover {
@@ -136,6 +164,39 @@ def redesigned_candidate_dashboard():
             margin-top: 64px;
             padding: 32px;
             min-height: calc(100vh - 64px);
+            transition: margin-left 0.3s ease;
+        }
+        
+        .main-content.sidebar-collapsed {
+            margin-left: 80px;
+        }
+        
+        /* Toggle Button */
+        .menu-toggle {
+            position: absolute;
+            top: 20px;
+            right: -15px;
+            width: 30px;
+            height: 30px;
+            background: #0055B8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 85, 184, 0.3);
+            transition: all 0.3s ease;
+            z-index: 101;
+        }
+        
+        .menu-toggle:hover {
+            background: #004494;
+            transform: scale(1.1);
+        }
+        
+        .menu-toggle .material-icons {
+            color: white;
+            font-size: 18px;
         }
         
         /* Cards */
@@ -155,13 +216,21 @@ def redesigned_candidate_dashboard():
         }
         
         .stat-card {
-            background: linear-gradient(135deg, #0055B8 0%, #003d82 100%);
+            background: linear-gradient(135deg, #003d82 0%, #002855 100%);
             border-radius: 20px;
             padding: 28px;
             color: white;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0, 85, 184, 0.3);
+            border: 1px solid #004494;
+            box-shadow: 0 4px 12px rgba(0, 61, 130, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            border-color: #0055B8;
+            box-shadow: 0 8px 20px rgba(0, 85, 184, 0.4);
+            transform: translateY(-4px);
         }
         
         .stat-card::before {
@@ -171,7 +240,7 @@ def redesigned_candidate_dashboard():
             right: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(0, 85, 184, 0.2) 0%, transparent 70%);
             animation: pulse 4s ease-in-out infinite;
         }
         
@@ -238,38 +307,43 @@ def redesigned_candidate_dashboard():
             color: white;
         }
         
-        /* Buttons */
+        /* Buttons - Brand Guidelines Compliant */
         .btn-primary {
-            background: linear-gradient(135deg, #0055B8 0%, #003d82 100%);
-            color: white;
-            padding: 12px 28px;
-            border-radius: 12px;
+            background-color: #0055B8 !important;
+            color: white !important;
+            padding: 12px 24px;
+            border-radius: 8px;
             font-weight: 600;
+            font-family: 'Raleway', sans-serif !important;
             border: none;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 16px rgba(0, 85, 184, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 85, 184, 0.2);
         }
         
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 24px rgba(0, 85, 184, 0.4);
+            background-color: #004494 !important;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 85, 184, 0.3);
         }
         
         .btn-secondary {
-            background: white;
-            color: #0055B8;
-            padding: 12px 28px;
-            border-radius: 12px;
+            background-color: white !important;
+            color: #0055B8 !important;
+            padding: 12px 24px;
+            border-radius: 8px;
             font-weight: 600;
-            border: 2px solid #0055B8;
+            font-family: 'Raleway', sans-serif !important;
+            border: 2px solid #0055B8 !important;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 85, 184, 0.1);
         }
         
         .btn-secondary:hover {
-            background: #0055B8;
-            color: white;
+            background-color: #F2F7FB !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 85, 184, 0.15);
         }
         
         /* Section Headers */
@@ -434,7 +508,7 @@ def redesigned_candidate_dashboard():
         .status-applied { background: #e2e8f0; color: #334155; border: 1px solid #cbd5e1; }
 
         /* ==========================
-           Table Brand Enforcement
+           Table Brand Enforcement - Strict Brand Guidelines
            ========================== */
         /* Apply to all tables including Quasar q-table */
         table, .q-table, .q-table * {
@@ -444,45 +518,70 @@ def redesigned_candidate_dashboard():
         /* Container */
         .q-table, table {
             background: #FFFFFF !important;
-            border: 1px solid #e2e8f0 !important;
+            border: 1px solid #e5e7eb !important;
             border-radius: 8px !important;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+            box-shadow: 0 2px 8px rgba(0, 85, 184, 0.08) !important;
         }
-        /* Header cells */
+        /* Header cells - Brand Colors */
         .q-table thead tr, thead tr {
-            background: #f8fafc !important;
-            border-bottom: 2px solid #e2e8f0 !important;
+            background: #F2F7FB !important;
+            border-bottom: 2px solid #0055B8 !important;
         }
         .q-th, thead th {
             text-transform: uppercase !important;
             letter-spacing: 0.5px !important;
             font-weight: 700 !important;
-            font-size: 11px !important;
-            color: #475569 !important;
-            padding: 10px 12px !important;
+            font-size: 12px !important;
+            color: #1A1A1A !important;
+            padding: 12px 16px !important;
+            font-family: 'Raleway', sans-serif !important;
         }
         /* Body cells */
         .q-td, tbody td {
-            font-size: 13px !important;
-            color: #334155 !important;
-            padding: 12px !important;
-            border-bottom: 1px solid #f1f5f9 !important;
+            font-size: 14px !important;
+            color: #4D4D4D !important;
+            padding: 14px 16px !important;
+            border-bottom: 1px solid #e5e7eb !important;
+            font-family: 'Raleway', sans-serif !important;
         }
         /* Rows */
         .q-tr:hover, tbody tr:hover {
-            background: #f8fafc !important;
+            background: #F2F7FB !important;
         }
         tbody tr:last-child .q-td, tbody tr:last-child td {
             border-bottom: none !important;
         }
-        /* Links and action buttons inside tables */
-        .q-table a, table a { color: #0055B8 !important; text-decoration: none !important; }
-        .q-table a:hover, table a:hover { text-decoration: underline !important; }
+        /* Links and action buttons inside tables - Brand Blue */
+        .q-table a, table a { 
+            color: #0055B8 !important; 
+            text-decoration: none !important;
+            font-weight: 600 !important;
+            font-family: 'Raleway', sans-serif !important;
+        }
+        .q-table a:hover, table a:hover { 
+            text-decoration: underline !important;
+            color: #004494 !important;
+        }
         .q-table .q-btn, table .q-btn {
-            color: #0055B8 !important;
+            background-color: #0055B8 !important;
+            color: white !important;
+            font-family: 'Raleway', sans-serif !important;
+            font-weight: 600 !important;
+            border-radius: 6px !important;
+            padding: 8px 16px !important;
+        }
+        .q-table .q-btn:hover, table .q-btn:hover {
+            background-color: #004494 !important;
         }
         /* Pagination/footer area */
-        .q-table__bottom, .q-table__separator { border-color: #e2e8f0 !important; }
+        .q-table__bottom, .q-table__separator { 
+            border-color: #e5e7eb !important;
+            background: #F2F7FB !important;
+        }
+        .q-table__bottom .q-btn {
+            color: #0055B8 !important;
+            font-family: 'Raleway', sans-serif !important;
+        }
     </style>
     ''')
     
@@ -531,7 +630,28 @@ def redesigned_candidate_dashboard():
     with ui.element('div').classes('dashboard-wrapper'):
         
         # Sidebar
-        with ui.element('div').classes('sidebar-modern'):
+        with ui.element('div').classes('sidebar-modern') as sidebar:
+            # Toggle Button
+            toggle_btn = ui.element('div').classes('menu-toggle')
+            with toggle_btn:
+                ui.icon('chevron_left').classes('toggle-icon')
+            
+            # Toggle functionality
+            def toggle_sidebar():
+                sidebar.classes(toggle='collapsed')
+                content_area_wrapper.classes(toggle='sidebar-collapsed')
+                # Change icon direction
+                if 'collapsed' in (sidebar._classes or ''):
+                    toggle_btn.clear()
+                    with toggle_btn:
+                        ui.icon('chevron_right').classes('toggle-icon')
+                else:
+                    toggle_btn.clear()
+                    with toggle_btn:
+                        ui.icon('chevron_left').classes('toggle-icon')
+            
+            toggle_btn.on('click', toggle_sidebar)
+            
             # User Profile Card
             with ui.element('div').classes('user-profile-card'):
                 with ui.row().classes('items-center gap-4'):
@@ -557,7 +677,7 @@ def redesigned_candidate_dashboard():
                             ui.label(initials)
                     
                     # User info
-                    with ui.column().classes('gap-1'):
+                    with ui.column().classes('gap-1 user-info'):
                         ui.label(user.get('name', 'User')).classes('text-white font-semibold text-base')
                         ui.label(user.get('email', '')).classes('text-gray-300 text-xs')
             
@@ -611,7 +731,9 @@ def redesigned_candidate_dashboard():
                 ui.label('Logout').classes('text-sm')
         
         # Main Content Area
-        content_area = ui.column().classes('main-content')
+        content_area_wrapper = ui.column().classes('main-content')
+        with content_area_wrapper:
+            content_area = ui.column()
 
         # Dialog for viewing files
         with ui.dialog() as file_dialog, ui.card().style('min-width: 80%; max-width: 95%;'):
@@ -1460,7 +1582,7 @@ def redesigned_candidate_dashboard():
                                 ).props('outlined dense').classes('w-full').bind_value(edit_state, 'cvUrl')
                                 if edit_state.get('cvUrl'):
                                     with ui.link(target=edit_state['cvUrl'], new_tab=True).style('text-decoration: none; margin-top: 8px; display: inline-block;'):
-                                        ui.button('View CV', icon='visibility').props('flat dense').style('background: #0055B8; color: white; font-size: 11px;')
+                                        ui.button('View CV', icon='visibility').props('flat dense').style('background: #0055B8 !important; color: white !important; font-size: 11px; font-family: "Raleway", sans-serif !important;')
                             
                             # GitHub URL
                             with ui.element('div').style('background: #f9fafb; padding: 16px; border-radius: 8px; border: 1px solid #e5e7eb;'):
@@ -1473,7 +1595,7 @@ def redesigned_candidate_dashboard():
                                 ).props('outlined dense').classes('w-full').bind_value(edit_state, 'github')
                                 if edit_state.get('github'):
                                     with ui.link(target=edit_state['github'], new_tab=True).style('text-decoration: none; margin-top: 8px; display: inline-block;'):
-                                        ui.button('View GitHub', icon='open_in_new').props('flat dense').style('background: #0055B8; color: white; font-size: 11px;')
+                                        ui.button('View GitHub', icon='open_in_new').props('flat dense').style('background: #0055B8 !important; color: white !important; font-size: 11px; font-family: "Raleway", sans-serif !important;')
                             
                             # Portfolio URL
                             with ui.element('div').style('background: #f9fafb; padding: 16px; border-radius: 8px; border: 1px solid #e5e7eb;'):
@@ -1486,12 +1608,12 @@ def redesigned_candidate_dashboard():
                                 ).props('outlined dense').classes('w-full').bind_value(edit_state, 'portfolio')
                                 if edit_state.get('portfolio'):
                                     with ui.link(target=edit_state['portfolio'], new_tab=True).style('text-decoration: none; margin-top: 8px; display: inline-block;'):
-                                        ui.button('View Portfolio', icon='open_in_new').props('flat dense').style('background: #0055B8; color: white; font-size: 11px;')
+                                        ui.button('View Portfolio', icon='open_in_new').props('flat dense').style('background: #0055B8 !important; color: white !important; font-size: 11px; font-family: "Raleway", sans-serif !important;')
                         
                         # Save Button
                         with ui.row().classes('gap-3 w-full justify-end'):
-                            ui.button('Cancel', icon='close').props('flat outlined').style('color: #6b7280; border-color: #e5e7eb;')
-                            ui.button('Save Profile', icon='save', on_click=update_profile).props('flat').style('background: linear-gradient(135deg, #0055B8 0%, #0066CC 100%); color: white; padding: 0 24px;')
+                            ui.button('Cancel', icon='close').props('flat outlined').style('color: #6b7280 !important; border-color: #e5e7eb !important; font-family: "Raleway", sans-serif !important;')
+                            ui.button('Save Profile', icon='save', on_click=update_profile).props('flat').style('background: #0055B8 !important; color: white !important; padding: 0 24px; font-family: "Raleway", sans-serif !important;')
                 
                 # Account Information - Modern Card Grid
                 with ui.element('div').style('background: white; padding: 0; margin-bottom: 24px; border: 1px solid #e5e7eb;'):
@@ -1705,8 +1827,8 @@ def redesigned_candidate_dashboard():
                                 ui.notify('Failed to add skills', type='negative')
                         
                         with ui.row().classes('gap-2 w-full'):
-                            ui.button('Save Selected Skills', icon='add_circle', on_click=save_selected_skills).props('flat').style('background: #0055B8; color: white; flex: 1;')
-                            ui.button('Clear Selection', icon='clear', on_click=lambda: skills_to_add.clear()).props('flat outlined').style('color: #6b7280; border-color: #e5e7eb;')
+                            ui.button('Save Selected Skills', icon='add_circle', on_click=save_selected_skills).props('flat').style('background: #0055B8 !important; color: white !important; flex: 1; font-family: "Raleway", sans-serif !important;')
+                            ui.button('Clear Selection', icon='clear', on_click=lambda: skills_to_add.clear()).props('flat outlined').style('color: #6b7280 !important; border-color: #e5e7eb !important; font-family: "Raleway", sans-serif !important;')
         
         def render_applications():
             """Applications tracking."""

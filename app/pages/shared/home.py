@@ -113,8 +113,8 @@ def _create_new_hero_section():
                 
                 # Action buttons
                 with ui.row().classes('gap-4 mt-8'):
-                    ui.button('Explore Jobs →', on_click=lambda: ui.navigate.to('/jobs')).classes('px-6 py-2.5 brand-primary-bg text-white button-label rounded-lg hover:opacity-90 transition-all')
-                    ui.button('For Employers', on_click=lambda: ui.navigate.to('/employer/post-job')).classes('px-6 py-2.5 border-2 border-gray-900 bg-transparent brand-charcoal button-label rounded-lg hover:bg-gray-900 hover:text-white transition-all')
+                    ui.button('Get Started →', on_click=lambda: ui.navigate.to('/login')).classes('px-8 py-3 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg').style('background-color: #0055B8 !important; font-family: "Raleway", sans-serif !important;')
+                    ui.button('For Employers', on_click=lambda: ui.navigate.to('/employer/dashboard')).classes('px-8 py-3 bg-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg').style('color: #0055B8 !important; border: 2px solid #0055B8 !important; font-family: "Raleway", sans-serif !important;')
 
             # Right side - Image grid
             with ui.column().classes('flex relative justify-center'):
@@ -178,8 +178,8 @@ def _create_new_about_section():
                 #     _create_about_feature('Skills development & training')
                 #     _create_about_feature('Strategic partnerships')
                 with ui.row().classes('gap-4 mt-8 justify-center'):
-                    ui.button('Learn More About Us →', on_click=lambda: ui.navigate.to('/about')).classes('px-6 py-3 brand-primary-bg text-white button-label rounded-lg hover:opacity-90 transition-all')
-                    ui.button('Contact Us', on_click=lambda: ui.navigate.to('/contact')).classes('px-6 py-3 border-2 border-gray-300 bg-white brand-charcoal button-label rounded-lg hover:border-gray-400 transition-all')
+                    ui.button('Learn More About Us →', on_click=lambda: ui.navigate.to('/about')).classes('px-8 py-3 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg').style('background-color: #0055B8 !important; font-family: "Raleway", sans-serif !important;')
+                    ui.button('Contact Us', on_click=lambda: ui.navigate.to('/contact')).classes('px-8 py-3 bg-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg').style('color: #0055B8 !important; border: 2px solid #0055B8 !important; font-family: "Raleway", sans-serif !important;')
 
 def _create_about_feature(text: str):
     """Creates a feature item with checkmark"""
@@ -221,7 +221,7 @@ def _new_feature_card(icon: str, title: str, items: list, button_text: str):
                 ui.label(item).classes('button-label brand-slate text-center')
         
         # Button
-        ui.button(button_text, on_click=lambda: ui.navigate.to('/search')).classes('w-full py-2.5 brand-primary-bg hover:opacity-90 text-white button-label rounded-lg transition-all shadow-sm hover:shadow-md')
+        ui.button(button_text, on_click=lambda: ui.navigate.to('/search')).classes('w-full py-3 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg').style('background-color: #0055B8 !important; font-family: "Raleway", sans-serif !important;')
 
 def _create_how_it_works_section():
     with ui.element('section').classes('py-24 brand-light-mist'):
@@ -240,7 +240,7 @@ def _create_how_it_works_section():
             
             # Learn More button
             with ui.row().classes('w-full justify-center mt-12'):
-                ui.button('Learn More →', on_click=lambda: ui.navigate.to('/how-it-works')).classes('px-6 py-3 brand-primary-bg text-white button-label rounded-lg hover:opacity-90 transition-all')
+                ui.button('Learn More →', on_click=lambda: ui.navigate.to('/how-it-works')).classes('px-8 py-3 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg').style('background-color: #0055B8 !important; font-family: "Raleway", sans-serif !important;')
 
 def _how_it_works_step(number: str, title: str, description: str, icon: str):
     with ui.card().classes('bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200'):
@@ -265,8 +265,8 @@ def _create_cta_section():
             ui.label('Join Dompell today and unlock a world of opportunities. Connect with top employers, access training programs, and build your career.').classes('mt-6 sub-heading-2 text-white opacity-90 max-w-2xl mx-auto')
             
             with ui.row().classes('gap-4 mt-10 justify-center flex-wrap'):
-                ui.button('Register Now →', on_click=lambda: ui.navigate.to('/login?tab=Sign+Up')).classes('px-8 py-4 button-label bg-white brand-primary rounded-lg hover:bg-gray-100 transition-all shadow-xl')
-                ui.button('Learn More', on_click=lambda: ui.navigate.to('/about')).classes('px-8 py-4 button-label border-2 border-white text-white rounded-lg hover:bg-white/10 transition-all')
+                ui.button('Register Now →', on_click=lambda: ui.navigate.to('/login?tab=Sign+Up')).classes('px-10 py-4 font-semibold rounded-lg transition-all shadow-xl hover:shadow-2xl').style('background-color: white !important; color: #0055B8 !important; font-family: "Raleway", sans-serif !important;')
+                ui.button('Learn More', on_click=lambda: ui.navigate.to('/about')).classes('px-10 py-4 font-semibold rounded-lg transition-all shadow-md hover:shadow-lg').style('border: 2px solid white !important; color: white !important; background-color: transparent !important; font-family: "Raleway", sans-serif !important;')
             
             # Trust indicators
             with ui.row().classes('mt-12 gap-8 justify-center flex-wrap opacity-80'):

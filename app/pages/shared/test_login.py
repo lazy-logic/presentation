@@ -80,7 +80,7 @@ def test_login_page():
                 ui.label('Quick Login').classes('text-4xl font-bold text-gray-800 raleway-font')
                 ui.label('Select a role to prefill login credentials and test the dashboards').classes('text-gray-600 raleway-font')
                 with ui.row().classes('justify-center gap-2 mt-2'):
-                    ui.label('DEMO').classes('badge')
+                    ui.label('DEMO VIDEO BELOW').classes('badge')
             
             # Two-column layout: Login cards on left, video on right
             with ui.row().classes('w-full gap-6 items-start').style('display: flex; flex-wrap: wrap;'):
@@ -135,16 +135,17 @@ def test_login_page():
                 
                 # Right column - Video embed
                 with ui.column().classes('flex-1').style('min-width: 400px; max-width: 600px;'):
-                    with ui.card().classes('test-card w-full p-0 overflow-hidden'):
-                        ui.html('''
-                            <div style="position:relative; width:100%; height:0px; padding-bottom:56.250%">
-                                <iframe allow="fullscreen;autoplay" allowfullscreen height="100%" 
-                                    src="https://streamable.com/e/wca103?autoplay=1&nocontrols=1" 
-                                    width="100%" 
-                                    style="border:none; width:100%; height:100%; position:absolute; left:0px; top:0px; overflow:hidden;">
-                                </iframe>
-                            </div>
-                        ''', sanitize=False)
+                    with ui.card().classes('test-card w-full p-0 overflow-hidden').style('min-height: 400px;'):
+                        video_container = ui.element('div').style('position:relative; width:100%; height:0px; padding-bottom:56.250%;')
+                        with video_container:
+                            ui.element('iframe').props(
+                                'src="https://streamable.com/e/wca103?autoplay=1&nocontrols=1" '
+                                'allow="fullscreen;autoplay" '
+                                'allowfullscreen '
+                                'frameborder="0"'
+                            ).style(
+                                'border:none; width:100%; height:100%; position:absolute; left:0px; top:0px; overflow:hidden;'
+                            )
 
 def prefill_and_navigate(role, credentials):
     """Store credentials in session and navigate to login page with prefilled data."""

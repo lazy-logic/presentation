@@ -74,7 +74,7 @@ def test_login_page():
     ''')
     
     with ui.column().classes('w-full min-h-screen flex items-center justify-center py-16 px-4'):
-        with ui.column().classes('w-full max-w-2xl mx-auto gap-6'):
+        with ui.column().classes('w-full max-w-7xl mx-auto gap-6'):
             # Header
             with ui.column().classes('text-center gap-3 mb-4'):
                 ui.label('Quick Login').classes('text-4xl font-bold text-gray-800 raleway-font')
@@ -82,52 +82,69 @@ def test_login_page():
                 with ui.row().classes('justify-center gap-2 mt-2'):
                     ui.label('DEMO').classes('badge')
             
-            # Test login cards
-            with ui.card().classes('test-card w-full p-8'):
-                with ui.column().classes('w-full gap-4'):
-                    # Employer
-                    with ui.card().classes('role-button w-full p-6 cursor-pointer').on('click', 
-                        lambda: prefill_and_navigate('EMPLOYER', test_credentials['EMPLOYER'])):
-                        with ui.row().classes('w-full items-center gap-4'):
-                            with ui.column().classes('flex-shrink-0'):
-                                ui.icon('business', size='48px').classes('text-[#0055B8]')
-                            with ui.column().classes('flex-grow gap-1'):
-                                ui.label('Login as Employer').classes('text-xl font-bold text-gray-800 raleway-font')
-                                ui.label('ABC Trust').classes('text-sm text-gray-600 raleway-font')
-                                with ui.row().classes('gap-2 mt-2'):
-                                    ui.label(f'📧 {test_credentials["EMPLOYER"]["email"]}').classes('text-xs text-gray-500 raleway-font')
-                            ui.icon('arrow_forward', size='24px').classes('text-gray-400')
+            # Two-column layout: Login cards on left, video on right
+            with ui.row().classes('w-full gap-6 items-start').style('display: flex; flex-wrap: wrap;'):
+                # Left column - Test login cards
+                with ui.column().classes('flex-1').style('min-width: 400px; max-width: 600px;'):
+                    # Test login cards
+                    with ui.card().classes('test-card w-full p-8'):
+                        with ui.column().classes('w-full gap-4'):
+                            # Employer
+                            with ui.card().classes('role-button w-full p-6 cursor-pointer').on('click', 
+                                lambda: prefill_and_navigate('EMPLOYER', test_credentials['EMPLOYER'])):
+                                with ui.row().classes('w-full items-center gap-4'):
+                                    with ui.column().classes('flex-shrink-0'):
+                                        ui.icon('business', size='48px').classes('text-[#0055B8]')
+                                    with ui.column().classes('flex-grow gap-1'):
+                                        ui.label('Login as Employer').classes('text-xl font-bold text-gray-800 raleway-font')
+                                        ui.label('ABC Trust').classes('text-sm text-gray-600 raleway-font')
+                                        with ui.row().classes('gap-2 mt-2'):
+                                            ui.label(f'📧 {test_credentials["EMPLOYER"]["email"]}').classes('text-xs text-gray-500 raleway-font')
+                                    ui.icon('arrow_forward', size='24px').classes('text-gray-400')
+                            
+                            # Candidate/Trainee
+                            with ui.card().classes('role-button w-full p-6 cursor-pointer').on('click', 
+                                lambda: prefill_and_navigate('TRAINEE', test_credentials['TRAINEE'])):
+                                with ui.row().classes('w-full items-center gap-4'):
+                                    with ui.column().classes('flex-shrink-0'):
+                                        ui.icon('person', size='48px').classes('text-[#10b981]')
+                                    with ui.column().classes('flex-grow gap-1'):
+                                        ui.label('Login as Candidate').classes('text-xl font-bold text-gray-800 raleway-font')
+                                        ui.label('Michael Abraham').classes('text-sm text-gray-600 raleway-font')
+                                        with ui.row().classes('gap-2 mt-2'):
+                                            ui.label(f'📧 {test_credentials["TRAINEE"]["email"]}').classes('text-xs text-gray-500 raleway-font')
+                                    ui.icon('arrow_forward', size='24px').classes('text-gray-400')
+                            
+                            # Institution
+                            with ui.card().classes('role-button w-full p-6 cursor-pointer').on('click', 
+                                lambda: prefill_and_navigate('INSTITUTION', test_credentials['INSTITUTION'])):
+                                with ui.row().classes('w-full items-center gap-4'):
+                                    with ui.column().classes('flex-shrink-0'):
+                                        ui.icon('school', size='48px').classes('text-[#8b5cf6]')
+                                    with ui.column().classes('flex-grow gap-1'):
+                                        ui.label('Login as Institution').classes('text-xl font-bold text-gray-800 raleway-font')
+                                        ui.label('MEST Ghana').classes('text-sm text-gray-600 raleway-font')
+                                        with ui.row().classes('gap-2 mt-2'):
+                                            ui.label(f'📧 {test_credentials["INSTITUTION"]["email"]}').classes('text-xs text-gray-500 raleway-font')
+                                    ui.icon('arrow_forward', size='24px').classes('text-gray-400')
                     
-                    # Candidate/Trainee
-                    with ui.card().classes('role-button w-full p-6 cursor-pointer').on('click', 
-                        lambda: prefill_and_navigate('TRAINEE', test_credentials['TRAINEE'])):
-                        with ui.row().classes('w-full items-center gap-4'):
-                            with ui.column().classes('flex-shrink-0'):
-                                ui.icon('person', size='48px').classes('text-[#10b981]')
-                            with ui.column().classes('flex-grow gap-1'):
-                                ui.label('Login as Candidate').classes('text-xl font-bold text-gray-800 raleway-font')
-                                ui.label('Michael Abraham').classes('text-sm text-gray-600 raleway-font')
-                                with ui.row().classes('gap-2 mt-2'):
-                                    ui.label(f'📧 {test_credentials["TRAINEE"]["email"]}').classes('text-xs text-gray-500 raleway-font')
-                            ui.icon('arrow_forward', size='24px').classes('text-gray-400')
-                    
-                    # Institution
-                    with ui.card().classes('role-button w-full p-6 cursor-pointer').on('click', 
-                        lambda: prefill_and_navigate('INSTITUTION', test_credentials['INSTITUTION'])):
-                        with ui.row().classes('w-full items-center gap-4'):
-                            with ui.column().classes('flex-shrink-0'):
-                                ui.icon('school', size='48px').classes('text-[#8b5cf6]')
-                            with ui.column().classes('flex-grow gap-1'):
-                                ui.label('Login as Institution').classes('text-xl font-bold text-gray-800 raleway-font')
-                                ui.label('MEST Ghana').classes('text-sm text-gray-600 raleway-font')
-                                with ui.row().classes('gap-2 mt-2'):
-                                    ui.label(f'📧 {test_credentials["INSTITUTION"]["email"]}').classes('text-xs text-gray-500 raleway-font')
-                            ui.icon('arrow_forward', size='24px').classes('text-gray-400')
-            
-            # Regular login link
-            with ui.row().classes('w-full justify-center mt-4'):
-                ui.label('Or').classes('text-gray-500 raleway-font')
-                ui.link('use regular login', '/auth-form').classes('text-[#0055B8] font-semibold raleway-font ml-2')
+                    # Regular login link
+                    with ui.row().classes('w-full justify-center mt-4'):
+                        ui.label('Or').classes('text-gray-500 raleway-font')
+                        ui.link('use regular login', '/auth-form').classes('text-[#0055B8] font-semibold raleway-font ml-2')
+                
+                # Right column - Video embed
+                with ui.column().classes('flex-1').style('min-width: 400px; max-width: 600px;'):
+                    with ui.card().classes('test-card w-full p-0 overflow-hidden'):
+                        ui.html('''
+                            <div style="position:relative; width:100%; height:0px; padding-bottom:56.250%">
+                                <iframe allow="fullscreen;autoplay" allowfullscreen height="100%" 
+                                    src="https://streamable.com/e/wca103?autoplay=1&nocontrols=1" 
+                                    width="100%" 
+                                    style="border:none; width:100%; height:100%; position:absolute; left:0px; top:0px; overflow:hidden;">
+                                </iframe>
+                            </div>
+                        ''', sanitize=False)
 
 def prefill_and_navigate(role, credentials):
     """Store credentials in session and navigate to login page with prefilled data."""

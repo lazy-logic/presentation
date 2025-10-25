@@ -802,7 +802,7 @@ def redesigned_candidate_dashboard():
                 # Welcome header without profile picture
                 with ui.row().classes('items-center justify-between w-full mb-8 p-4'):
                     with ui.column().classes('gap-2'):
-                        ui.label(f'Welcome back, {user.get("name", "User").split()[0]}!').classes('text-4xl font-bold text-gray-800')
+                        ui.label(f'Welcome back, {user.get("name", "Michael Abraham").split()[0]}!').classes('text-4xl font-bold text-gray-800')
                         ui.label('Complete your profile and upload your documents to get started.').classes('text-lg text-gray-600')
                     
                 

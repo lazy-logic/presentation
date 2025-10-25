@@ -261,12 +261,12 @@ def modern_employer_dashboard():
             # User Profile Card
             with ui.element('div').classes('user-profile-card'):
                 with ui.row().classes('items-center gap-4'):
-                    initials = ''.join([n[0].upper() for n in user.get('name', 'E').split()[:2]])
+                    initials = ''.join([n[0].upper() for n in user.get('name', 'ABC Trust').split()[:2]])
                     with ui.element('div').classes('profile-avatar'):
                         ui.label(initials)
                     
                     with ui.column().classes('gap-1'):
-                        ui.label(user.get('name', 'Employer')).classes('text-white font-semibold text-base')
+                        ui.label(user.get('name', 'ABC Trust')).classes('text-white font-semibold text-base')
                         ui.label(user.get('email', '')).classes('text-gray-300 text-xs')
             
             ui.separator().style('background: rgba(255,255,255,0.1); margin: 20px 0;')
@@ -361,7 +361,7 @@ def modern_employer_dashboard():
         
         def render_overview():
             """Render the overview dashboard section."""
-            ui.label(f'Welcome back, {user.get("name")}!').classes('section-header')
+            ui.label(f'Welcome back, {user.get("name", "ABC Trust")}!').classes('section-header')
             
             # Stats cards
             with ui.row().classes('w-full gap-6 mb-8'):
@@ -428,6 +428,9 @@ def modern_employer_dashboard():
         
         def render_job_postings():
             """Render job postings section."""
+            # State for showing create form
+            show_create_form = {'visible': False}
+            
             # Get jobs from session storage
             posted_jobs = app.storage.user.get('job_postings', [])
             if not posted_jobs:
@@ -464,10 +467,19 @@ def modern_employer_dashboard():
                     },
                 ]
             
+            def toggle_create_form():
+                show_create_form['visible'] = not show_create_form['visible']
+                navigate_to_section('postings')
+            
             with ui.row().classes('w-full items-center justify-between mb-2'):
                 ui.label('Job Postings').classes('section-header')
-                ui.button('Create New Job', 
-                         on_click=lambda: ui.navigate.to('/employer/job-posting')).classes('btn-primary')
+                ui.button('Create New Job' if not show_create_form['visible'] else 'View Job List', 
+                         on_click=toggle_create_form).classes('btn-primary')
+            
+            # Show create form if visible
+            if show_create_form['visible']:
+                render_create_job_form(toggle_create_form)
+                return
 
             # Filters and sort controls
             with ui.row().classes('w-full items-center justify-between mb-4'):
@@ -561,7 +573,7 @@ def modern_employer_dashboard():
                     ui.label('No job postings yet').classes('text-gray-500 text-xl')
                     ui.label('Create your first job posting to start attracting candidates').classes('text-gray-400')
                     ui.button('Create Job Posting', 
-                             on_click=lambda: ui.navigate.to('/employer/job-posting')).classes('btn-primary mt-4')
+                             on_click=toggle_create_form).classes('btn-primary mt-4')
         
         def close_job_posting(job_id):
             """Close/deactivate a job posting."""
@@ -574,6 +586,71 @@ def modern_employer_dashboard():
                     # Refresh the section
                     navigate_to_section('postings')
                     break
+        
+        def render_create_job_form(on_cancel):
+            """Render inline job creation form."""
+            from datetime import datetime
+            
+            job_data = {
+                'title': '',
+                'location': '',
+                'type': 'Full-time',
+                'experienceLevel': 'Entry Level (0-2 years)',
+                'description': '',
+                'requirements': '',
+                'salary': '',
+            }
+            
+            def save_job():
+                if not job_data['title']:
+                    ui.notify('Job title is required', type='negative')
+                    return
+                if not job_data['location']:
+                    ui.notify('Location is required', type='negative')
+                    return
+                
+                # Create new job posting
+                import uuid
+                new_job = {
+                    'id': str(uuid.uuid4())[:8],
+                    'title': job_data['title'],
+                    'location': job_data['location'],
+                    'type': job_data['type'],
+                    'experienceLevel': job_data['experienceLevel'],
+                    'description': job_data['description'],
+                    'requirements': job_data['requirements'],
+                    'salary': job_data['salary'],
+                    'status': 'active',
+                    'applications': 0,
+                    'postedDate': datetime.now().strftime('%Y-%m-%d')
+                }
+                
+                # Save to storage
+                jobs = app.storage.user.get('job_postings', [])
+                jobs.append(new_job)
+                app.storage.user['job_postings'] = jobs
+                
+                ui.notify(f"Job posting '{job_data['title']}' created successfully!", type='positive')
+                navigate_to_section('postings')
+            
+            with ui.card().classes('glass-card'):
+                ui.label('Create New Job Posting').classes('text-2xl font-bold mb-4')
+                
+                with ui.column().classes('w-full gap-4'):
+                    ui.input('Job Title', placeholder='e.g., Senior Software Engineer').classes('w-full').props('outlined').bind_value(job_data, 'title')
+                    ui.input('Location', placeholder='e.g., Lagos, Nigeria or Remote').classes('w-full').props('outlined').bind_value(job_data, 'location')
+                    
+                    with ui.row().classes('w-full gap-4'):
+                        ui.select(['Full-time', 'Part-time', 'Contract', 'Internship'], label='Job Type', value='Full-time').classes('flex-1').props('outlined').bind_value(job_data, 'type')
+                        ui.select(['Entry Level (0-2 years)', 'Mid Level (2-5 years)', 'Senior Level (5+ years)', 'Executive'], label='Experience Level', value='Entry Level (0-2 years)').classes('flex-1').props('outlined').bind_value(job_data, 'experienceLevel')
+                    
+                    ui.input('Salary Range (Optional)', placeholder='e.g., $50,000 - $70,000').classes('w-full').props('outlined').bind_value(job_data, 'salary')
+                    ui.textarea('Job Description', placeholder='Describe the role, responsibilities, and what the candidate will be doing...').classes('w-full').props('outlined rows=4').bind_value(job_data, 'description')
+                    ui.textarea('Requirements', placeholder='List the required skills, qualifications, and experience...').classes('w-full').props('outlined rows=4').bind_value(job_data, 'requirements')
+                    
+                    with ui.row().classes('w-full justify-end gap-3 mt-4'):
+                        ui.button('Cancel', on_click=on_cancel).classes('btn-secondary')
+                        ui.button('Create Job Posting', on_click=save_job).classes('btn-primary')
 
         
         def render_applications():
@@ -729,7 +806,7 @@ def modern_employer_dashboard():
                 ui.label('Profile Information').classes('text-lg font-semibold brand-charcoal mb-4')
                 
                 with ui.column().classes('gap-4'):
-                    ui.input('Full Name', value=user.get('name', '')).props('outlined readonly').classes('w-full')
+                    ui.input('Full Name', value=user.get('name', 'ABC Trust')).props('outlined readonly').classes('w-full')
                     ui.input('Email', value=user.get('email', '')).props('outlined readonly').classes('w-full')
                     ui.label('Contact support to change your email or name').classes('text-sm text-gray-500')
             

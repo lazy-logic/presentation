@@ -197,21 +197,8 @@ def _create_login_form():
                 if role == 'ADMIN':
                     ui.navigate.to('/admin/dashboard')
                 elif role == 'EMPLOYER':
-                    # Check if employer profile is complete
-                    employer_profile = user_data.get('employerProfile')
-                    profile_complete = (
-                        employer_profile and
-                        employer_profile.get('companyName') and
-                        employer_profile.get('industry') and
-                        employer_profile.get('companySize')
-                    )
-                    
-                    if not profile_complete:
-                        # Redirect to onboarding if profile incomplete or None
-                        ui.notify("Please complete your company profile", color='info')
-                        ui.navigate.to('/employer/onboarding/profile')
-                    else:
-                        ui.navigate.to('/employers/dashboard')
+                    # Always redirect to dashboard
+                    ui.navigate.to('/employers/dashboard')
                 elif role == 'INSTITUTION':
                     ui.navigate.to('/institutions/dashboard')
                 else:  # TRAINEE or default

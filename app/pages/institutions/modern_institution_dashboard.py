@@ -61,7 +61,7 @@ def modern_institution_dashboard():
                 else:
                     print(f"[INSTITUTION_DASH] No organization found for user")
                     state['organization'] = {
-                        'name': user.get('name', 'Institution'),
+                        'name': user.get('name', 'MEST Ghana'),
                         'description': 'Professional training institution',
                         'website': '',
                         'location': '',
@@ -70,7 +70,7 @@ def modern_institution_dashboard():
             else:
                 print(f"[INSTITUTION_DASH] Failed to load organization, using demo")
                 state['organization'] = {
-                    'name': user.get('name', 'Institution'),
+                    'name': user.get('name', 'MEST Ghana'),
                     'description': 'Professional training institution',
                     'website': '',
                     'location': '',
@@ -79,7 +79,7 @@ def modern_institution_dashboard():
         except Exception as e:
             print(f"[INSTITUTION_DASH] Error loading organization: {e}")
             state['organization'] = {
-                'name': user.get('name', 'Institution'),
+                'name': user.get('name', 'MEST Ghana'),
                 '_demo': True
             }
     
@@ -667,7 +667,7 @@ def modern_institution_dashboard():
                 with ui.card().style('background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 16px; border-radius: 12px; backdrop-filter: blur(10px);'):
                     with ui.row().classes('items-center gap-3'):
                         # Use organization logo if available, otherwise initials
-                        org_name = state['organization'].get('name', user.get('name', 'Institution'))
+                        org_name = state['organization'].get('name', user.get('name', 'MEST Ghana'))
                         org_logo = state['organization'].get('logoUrl', '')
                         
                         if org_logo:
@@ -768,7 +768,7 @@ def modern_institution_dashboard():
             with ui.element('div').classes('section-header'):
                 with ui.row().classes('items-center justify-between w-full'):
                     with ui.column().classes('gap-1'):
-                        ui.label(f'Welcome Back, {user.get("name", "Institution")}!').classes('section-title')
+                        ui.label(f'Welcome Back, {user.get("name", "MEST Ghana")}!').classes('section-title')
                         ui.label('Here\'s what\'s happening with your institution today').classes('section-subtitle')
             
             # Metrics Grid

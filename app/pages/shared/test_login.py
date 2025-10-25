@@ -15,12 +15,6 @@ def test_login_page():
             'name': 'ABC Trust',
             'color': '#0055B8'
         },
-        'TRAINEE': {
-            'email': 'vole59305@aminating.com',
-            'password': 'Myke@2322',
-            'name': 'Michael Abraham',
-            'color': '#10b981'
-        },
         'INSTITUTION': {
             'email': 'newt73321@aminating.com',
             'password': 'MEST@Ghana2025',
@@ -100,19 +94,6 @@ def test_login_page():
                                         ui.label('ABC Trust').classes('text-sm text-gray-600 raleway-font')
                                         with ui.row().classes('gap-2 mt-2'):
                                             ui.label(f'📧 {test_credentials["EMPLOYER"]["email"]}').classes('text-xs text-gray-500 raleway-font')
-                                    ui.icon('arrow_forward', size='24px').classes('text-gray-400')
-                            
-                            # Candidate/Trainee
-                            with ui.card().classes('role-button w-full p-6 cursor-pointer').on('click', 
-                                lambda: prefill_and_navigate('TRAINEE', test_credentials['TRAINEE'])):
-                                with ui.row().classes('w-full items-center gap-4'):
-                                    with ui.column().classes('flex-shrink-0'):
-                                        ui.icon('person', size='48px').classes('text-[#10b981]')
-                                    with ui.column().classes('flex-grow gap-1'):
-                                        ui.label('Login as Candidate').classes('text-xl font-bold text-gray-800 raleway-font')
-                                        ui.label('Michael Abraham').classes('text-sm text-gray-600 raleway-font')
-                                        with ui.row().classes('gap-2 mt-2'):
-                                            ui.label(f'📧 {test_credentials["TRAINEE"]["email"]}').classes('text-xs text-gray-500 raleway-font')
                                     ui.icon('arrow_forward', size='24px').classes('text-gray-400')
                             
                             # Institution

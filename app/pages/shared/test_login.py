@@ -80,7 +80,7 @@ def test_login_page():
                 ui.label('Quick Login').classes('text-4xl font-bold text-gray-800 raleway-font')
                 ui.label('Select a role to prefill login credentials and test the dashboards').classes('text-gray-600 raleway-font')
                 with ui.row().classes('justify-center gap-2 mt-2'):
-                    ui.label('DEMO VIDEO BELOW').classes('badge')
+                    ui.label('DEMO').classes('badge')
             
             # Two-column layout: Login cards on left, video on right
             with ui.row().classes('w-full gap-6 items-start').style('display: flex; flex-wrap: wrap;'):

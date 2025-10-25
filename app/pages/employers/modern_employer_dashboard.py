@@ -112,89 +112,147 @@ def modern_employer_dashboard():
     
     header('/employers/dashboard')
     
-    # Modern styling (same as candidate dashboard)
+    # Professional Modern Dashboard Styles (from institution dashboard)
     ui.add_head_html('''
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { 
-            font-family: 'Raleway', sans-serif; 
-            scroll-behavior: smooth;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            box-sizing: border-box;
         }
-        .dashboard-wrapper { background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%); min-height: 100vh; }
-        .sidebar-modern { background: linear-gradient(180deg, #1A1A1A 0%, #2d2d2d 100%); width: 280px; position: fixed; left: 0; top: 64px; height: calc(100vh - 64px); overflow-y: auto; box-shadow: 4px 0 24px rgba(0,0,0,0.15); z-index: 1001; transition: transform 0.3s ease; }
-        .user-profile-card { background: rgba(0, 85, 184, 0.1); border: 1px solid rgba(0, 85, 184, 0.3); border-radius: 16px; padding: 20px; margin: 20px; }
-        .profile-avatar { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #0055B8 0%, #003d82 100%); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; font-weight: 700; box-shadow: 0 4px 12px rgba(0, 85, 184, 0.3); }
-        .nav-item { padding: 14px 24px; margin: 8px 16px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 12px; color: #b0b0b0; font-weight: 500; }
-        .nav-item:hover { background: rgba(0, 85, 184, 0.1); color: #0055B8; transform: translateX(4px); }
-        .nav-item.active { background: linear-gradient(135deg, #0055B8 0%, #003d82 100%); color: white; box-shadow: 0 4px 16px rgba(0, 85, 184, 0.4); }
-        .main-content { margin-left: 280px; margin-top: 64px; padding: 32px; min-height: calc(100vh - 64px); transition: margin-left 0.3s ease; }
-        .main-content.sidebar-collapsed { margin-left: 0; }
-        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: 20px; padding: 28px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08); border: 1px solid rgba(255, 255, 255, 0.8); }
-        .section-header { font-size: 28px; font-weight: 700; color: #1A1A1A; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
-        .section-header::before { content: ''; width: 4px; height: 32px; background: linear-gradient(180deg, #0055B8 0%, #003d82 100%); border-radius: 2px; }
-        .btn-primary { background: linear-gradient(135deg, #0055B8 0%, #003d82 100%); color: white; padding: 12px 28px; border-radius: 12px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(0, 85, 184, 0.3); }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0, 85, 184, 0.4); }
-        .btn-secondary { background: white; color: #0055B8; padding: 12px 28px; border-radius: 12px; font-weight: 600; border: 2px solid #0055B8; cursor: pointer; transition: all 0.3s ease; }
-        .btn-secondary:hover { background: #0055B8; color: white; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-in { animation: fadeIn 0.6s ease forwards; }
-
-        /* ==========================
-           Table Brand Enforcement
-           ========================== */
-        table, .q-table, .q-table * {
-            font-family: 'Raleway', sans-serif !important;
-            color: #1A1A1A !important;
+        
+        body {
+            background: #FFFFFF;
+            font-size: 14px;
+            line-height: 1.5;
         }
-        .q-table, table {
-            background: #FFFFFF !important;
-            border: 1px solid #e2e8f0 !important;
-            border-radius: 8px !important;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+        
+        /* Professional Card System */
+        .pro-card {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            padding: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .q-table thead tr, thead tr {
-            background: #f8fafc !important;
-            border-bottom: 2px solid #e2e8f0 !important;
+        
+        .pro-card:hover {
+            box-shadow: 0 3px 10px rgba(0, 85, 184, 0.08);
+            transform: translateY(-1px);
         }
-        .q-th, thead th {
-            text-transform: uppercase !important;
-            letter-spacing: 0.5px !important;
-            font-weight: 700 !important;
-            font-size: 11px !important;
-            color: #475569 !important;
-            padding: 10px 12px !important;
+        
+        /* Metric Cards - Dark Blue Analytics Cards */
+        .metric-card {
+            background: linear-gradient(135deg, #003d82 0%, #002855 100%);
+            border-radius: 20px;
+            border: 1px solid #004494;
+            padding: 28px;
+            margin: 8px 0;
+            margin-left: 15px;
+            margin-right: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 61, 130, 0.3);
+            color: white;
         }
-        .q-td, tbody td {
-            font-size: 13px !important;
-            color: #334155 !important;
-            padding: 12px !important;
-            border-bottom: 1px solid #f1f5f9 !important;
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 85, 184, 0.2) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
         }
-        .q-tr:hover, tbody tr:hover { background: #f8fafc !important; }
-        tbody tr:last-child .q-td, tbody tr:last-child td { border-bottom: none !important; }
-        .q-table a, table a { color: #0055B8 !important; text-decoration: none !important; }
-        .q-table a:hover, table a:hover { text-decoration: underline !important; }
-        .q-table .q-btn, table .q-btn { color: #0055B8 !important; }
-        .q-table__bottom, .q-table__separator { border-color: #e2e8f0 !important; }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .metric-card:hover {
+            border-color: #0055B8 !important;
+            box-shadow: 0 8px 20px rgba(0, 85, 184, 0.4) !important;
+            transform: translateY(-4px);
+        }
+        
+        /* White text for metric cards */
+        .metric-card * {
+            color: white !important;
+        }
+        
+        .metric-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: white !important;
+            line-height: 1;
+            margin: 6px 0 4px 0;
+        }
+        
+        .metric-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .metric-trend {
+            font-size: 11px;
+            color: #4ade80 !important;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        
+        /* Dark Sidebar Design */
+        .pro-sidebar {
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            border-right: 1px solid #334155;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 64px;
+            width: 280px;
+            z-index: 1001;
+            transition: transform 0.3s ease;
+        }
         
         /* Mobile Responsive Styles */
         @media (max-width: 1023px) {
-            .sidebar-modern {
+            .pro-sidebar {
                 transform: translateX(-100%);
                 box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
             }
             
-            .sidebar-modern.mobile-open {
+            .pro-sidebar.mobile-open {
                 transform: translateX(0);
             }
             
-            .main-content {
+            .dashboard-main-content {
                 margin-left: 0 !important;
                 padding: 16px !important;
             }
             
-            .glass-card {
-                padding: 16px !important;
+            .metric-card {
+                margin: 8px 0 !important;
+            }
+            
+            .metric-value {
+                font-size: 18px !important;
+            }
+            
+            .pro-card {
+                padding: 12px !important;
+            }
+            
+            /* Stack cards vertically on mobile */
+            .grid {
+                grid-template-columns: 1fr !important;
             }
             
             /* Mobile hamburger menu button */
@@ -230,6 +288,303 @@ def modern_employer_dashboard():
             .mobile-hamburger {
                 display: none !important;
             }
+            
+            .dashboard-main-content {
+                margin-left: 280px;
+            }
+        }
+        
+        /* Mobile overlay */
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 64px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        
+        .mobile-overlay.active {
+            display: block;
+        }
+        
+        /* Dark Navigation */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 16px;
+            margin: 4px 0;
+            border-radius: 10px;
+            text-align: left;
+            transition: all 0.2s ease;
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            color: #94a3b8;
+            cursor: pointer;
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff !important;
+        }
+        
+        .nav-item.active {
+            background: linear-gradient(135deg, #0055B8 0%, #003d82 100%) !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(0, 85, 184, 0.4) !important;
+        }
+        
+        /* Professional Buttons */
+        .pro-btn-primary, .pro-btn-primary * {
+            background: linear-gradient(135deg, #0055B8 0%, #003d82 100%) !important;
+            color: white !important;
+            padding: 8px 16px !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            border: none !important;
+            transition: all 0.3s ease !important;
+            font-size: 13px !important;
+            box-shadow: 0 2px 8px rgba(0, 85, 184, 0.2) !important;
+        }
+        
+        .pro-btn-primary:hover, .pro-btn-primary:hover * {
+            box-shadow: 0 4px 12px rgba(0, 85, 184, 0.3) !important;
+            transform: translateY(-1px) !important;
+            background: linear-gradient(135deg, #0055B8 0%, #003d82 100%) !important;
+            color: white !important;
+        }
+        
+        .pro-btn-secondary, .pro-btn-secondary * {
+            background: white !important;
+            color: #0055B8 !important;
+            padding: 7px 14px !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            border: 2px solid #e2e8f0 !important;
+            transition: all 0.3s ease !important;
+            font-size: 12px !important;
+        }
+        
+        .pro-btn-secondary:hover, .pro-btn-secondary:hover * {
+            background: #f8fafc !important;
+            border-color: #0055B8 !important;
+            transform: translateY(-1px) !important;
+            color: #0055B8 !important;
+        }
+        
+        /* Force all buttons to follow brand profile */
+        button, .q-btn {
+            font-family: 'Inter', sans-serif !important;
+        }
+        
+        button.pro-btn-primary, .q-btn.pro-btn-primary {
+            background: linear-gradient(135deg, #0055B8 0%, #003d82 100%) !important;
+            color: white !important;
+            border: none !important;
+        }
+        
+        button.pro-btn-secondary, .q-btn.pro-btn-secondary {
+            background: white !important;
+            color: #0055B8 !important;
+            border: 2px solid #e2e8f0 !important;
+        }
+        
+        /* Action Buttons - Redesigned */
+        .action-button-primary {
+            background: linear-gradient(135deg, #0055B8 0%, #003d82 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 85, 184, 0.25);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            min-width: 180px;
+        }
+        
+        .action-button-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 85, 184, 0.35);
+        }
+        
+        .action-button-primary * {
+            color: white !important;
+        }
+        
+        .action-button-secondary {
+            background: white;
+            color: #0055B8;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #e2e8f0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            min-width: 180px;
+        }
+        
+        .action-button-secondary:hover {
+            background: #f8fafc;
+            border-color: #0055B8;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0, 85, 184, 0.15);
+        }
+        
+        .action-button-secondary * {
+            color: #0055B8 !important;
+        }
+        
+        @media (max-width: 768px) {
+            .action-button-primary,
+            .action-button-secondary {
+                flex: 1 1 100%;
+                min-width: 100%;
+            }
+        }
+        
+        /* Section Header */
+        .section-header {
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+        
+        .section-subtitle {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 3px;
+        }
+
+        /* ==========================
+           Table Brand Enforcement
+           ========================== */
+        table, .q-table, .q-table * {
+            font-family: 'Inter', sans-serif !important;
+            color: #1A1A1A !important;
+        }
+        .q-table, table {
+            background: #FFFFFF !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 8px !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+        }
+        .q-table thead tr, thead tr {
+            background: #f8fafc !important;
+            border-bottom: 2px solid #e2e8f0 !important;
+        }
+        .q-th, thead th {
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            font-weight: 700 !important;
+            font-size: 11px !important;
+            color: #475569 !important;
+            padding: 10px 12px !important;
+        }
+        .q-td, tbody td {
+            font-size: 13px !important;
+            color: #334155 !important;
+            padding: 12px !important;
+            border-bottom: 1px solid #f1f5f9 !important;
+        }
+        .q-tr:hover, tbody tr:hover { background: #f8fafc !important; }
+        tbody tr:last-child .q-td, tbody tr:last-child td { border-bottom: none !important; }
+        .q-table a, table a { color: #0055B8 !important; text-decoration: none !important; }
+        .q-table a:hover, table a:hover { text-decoration: underline !important; }
+        .q-table .q-btn, table .q-btn { color: #0055B8 !important; }
+        .q-table__bottom, .q-table__separator { border-color: #e2e8f0 !important; }
+        
+        /* Table Responsive - Horizontal Scroll */
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        table {
+            min-width: 600px;
+            width: 100%;
+        }
+        
+        /* Overview Table - More elegant spacing */
+        .overview-table th {
+            background: #f8fafc;
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .overview-table td {
+            padding: 18px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 13px;
+            color: #334155;
+        }
+        
+        .overview-table tr:hover {
+            background: #fafbfc;
+        }
+        
+        .overview-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* Grid Layouts */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .content-grid {
+            display: grid;
+            gap: 14px;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
     </style>
     ''')
@@ -253,74 +608,84 @@ def modern_employer_dashboard():
         'page_size': 10,
     }
 
-    # Main dashboard wrapper
-    with ui.element('div').classes('dashboard-wrapper'):
-        # Sidebar
-        sidebar = ui.element('div').classes('sidebar-modern')
+    # Professional Dashboard Layout
+    with ui.row().classes('w-full').style('min-height: 100vh; gap: 0; margin: 0; padding-top: 64px;'):
+        # Professional Sidebar
+        sidebar = ui.column().classes('pro-sidebar').style('width: 260px; padding: 24px 20px; position: fixed; left: 0; top: 64px; bottom: 64px; overflow-y: auto; z-index: 40;')
         with sidebar:
-            # User Profile Card
-            with ui.element('div').classes('user-profile-card'):
-                with ui.row().classes('items-center gap-4'):
-                    initials = ''.join([n[0].upper() for n in user.get('name', 'ABC Trust').split()[:2]])
-                    with ui.element('div').classes('profile-avatar'):
-                        ui.label(initials)
-                    
-                    with ui.column().classes('gap-1'):
-                        ui.label(user.get('name', 'ABC Trust')).classes('text-white font-semibold text-base')
-                        ui.label(user.get('email', '')).classes('text-gray-300 text-xs')
+            # Brand Section
+            with ui.column().classes('mb-8'):
+                # User Profile Card
+                with ui.card().style('background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 16px; border-radius: 12px; backdrop-filter: blur(10px);'):
+                    with ui.row().classes('items-center gap-3'):
+                        # Company logo or initials
+                        if company_logo:
+                            with ui.element('div').style('width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2); box-shadow: 0 2px 8px rgba(0, 85, 184, 0.3);'):
+                                ui.image(company_logo).style('width: 100%; height: 100%; object-fit: cover;')
+                        else:
+                            initials = ''.join([n[0].upper() for n in company_name.split()[:2]])
+                            with ui.element('div').style('width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #0055B8 0%, #003d82 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0, 85, 184, 0.3);'):
+                                ui.label(initials).style('color: white; font-weight: 700; font-size: 16px;')
+                        
+                        with ui.column().classes('gap-0 flex-1'):
+                            ui.label(company_name).style('font-size: 14px; font-weight: 700; color: #ffffff; line-height: 1;')
+                            ui.label(user.get('email', '')).style('font-size: 11px; color: #94a3b8; margin-top: 4px;')
             
-            ui.separator().style('background: rgba(255,255,255,0.1); margin: 20px 0;')
+            ui.separator().style('margin: 20px 0; background: rgba(255, 255, 255, 0.1);')
             
-            # Navigation menu (no icons)
-            menu_items = [
-                ('overview', 'Dashboard'),
-                ('postings', 'Job Postings'),
-                ('applications', 'Applications'),
-                ('candidates', 'Candidates'),
-                ('company', 'Company Profile'),
-                ('settings', 'Settings'),
-            ]
+            # Navigation Menu
+            with ui.column().classes('flex-1').style('gap: 4px;'):
+                menu_items = [
+                    ('overview', 'dashboard', 'Dashboard'),
+                    ('postings', 'work', 'Job Postings'),
+                    ('applications', 'assignment', 'Applications'),
+                    ('candidates', 'group', 'Candidates'),
+                    ('company', 'business', 'Company Profile'),
+                    ('settings', 'settings', 'Settings'),
+                ]
+                
+                menu_buttons = {}
+                
+                # Define close function before menu handlers
+                def close_mobile_menu():
+                    sidebar.classes(remove='mobile-open')
+                
+                def create_nav_handler(section):
+                    def handler():
+                        active_section['current'] = section
+                        for sec, btn_el in menu_buttons.items():
+                            btn_el.classes(remove='active', add='')
+                        menu_buttons[section].classes(add='active')
+                        content_area.clear()
+                        with content_area:
+                            render_section(section)
+                        # Auto-hide sidebar on mobile after clicking menu item
+                        close_mobile_menu()
+                    return handler
+                
+                for section, icon, label in menu_items:
+                    is_active = section == active_section['current']
+                    nav_el = ui.element('div').classes(f'nav-item {"active" if is_active else ""}')
+                    nav_el.on('click', create_nav_handler(section))
+                    with nav_el:
+                        ui.icon(icon, size='20px')
+                        ui.label(label)
+                    menu_buttons[section] = nav_el
             
-            menu_buttons = {}
-            
-            # Define close function before menu handlers
-            def close_mobile_menu():
-                sidebar.classes(remove='mobile-open')
-            
-            def create_nav_handler(section):
-                def handler():
-                    active_section['current'] = section
-                    for sec, btn_el in menu_buttons.items():
-                        btn_el.classes(remove='active', add='')
-                    menu_buttons[section].classes(add='active')
-                    content_area.clear()
-                    with content_area:
-                        render_section(section)
-                    # Auto-hide sidebar on mobile after clicking menu item
-                    close_mobile_menu()
-                return handler
-            
-            for section, label in menu_items:
-                is_active = section == active_section['current']
-                nav_el = ui.element('div').classes(f'nav-item {"active" if is_active else ""}')
-                nav_el.on('click', create_nav_handler(section))
-                with nav_el:
-                    ui.label(label).classes('text-sm')
-                menu_buttons[section] = nav_el
-            
-            ui.separator().style('background: rgba(255,255,255,0.1); margin: 20px 0;')
+            ui.separator().style('margin: 20px 0; background: rgba(255, 255, 255, 0.1);')
             
             def logout_handler():
                 from app.services.auth_utils import logout
                 logout()
             
-            logout_el = ui.element('div').classes('nav-item')
-            logout_el.on('click', logout_handler)
-            with logout_el:
-                ui.label('Logout').classes('text-sm')
+            logout_btn = ui.element('div').classes('nav-item')
+            logout_btn.on('click', logout_handler)
+            with logout_btn:
+                ui.icon('logout', size='20px')
+                ui.label('Logout')
 
         # Main Content Area
-        content_area = ui.column().classes('main-content')
+        content_area = ui.column().classes('dashboard-main-content').style('flex: 1; padding: 32px; margin-top: 64px; min-height: calc(100vh - 128px);')
         
         # Mobile hamburger menu button (top-left corner)
         mobile_hamburger = ui.element('div').classes('mobile-hamburger')
@@ -361,54 +726,61 @@ def modern_employer_dashboard():
         
         def render_overview():
             """Render the overview dashboard section."""
-            ui.label(f'Welcome back, {user.get("name", "ABC Trust")}!').classes('section-header')
+            # Welcome Header
+            with ui.row().classes('items-center justify-between w-full').style('margin-bottom: 20px;'):
+                with ui.column().classes('gap-1'):
+                    ui.label(f'Welcome Back, {user.get("name", "ABC Trust")}!').classes('section-title')
+                    ui.label('Here\'s what\'s happening with your company today').classes('section-subtitle')
             
-            # Stats cards
-            with ui.row().classes('w-full gap-6 mb-8'):
-                # Active Job Postings Card
-                with ui.card().classes('glass-card flex-1'):
-                    ui.label('Active Job Postings').classes('text-gray-600 text-sm font-medium mb-2')
-                    ui.label(str(dashboard_data['active_postings'])).classes('text-4xl font-bold brand-primary mb-1')
-                    ui.label('Currently accepting applications').classes('text-xs text-gray-500')
+            # Metrics Grid with Dark Blue Cards
+            with ui.element('div').classes('stats-grid'):
+                metrics = [
+                    ('Active Job Postings', dashboard_data['active_postings'], 'work', '#0055B8', '+12% from last month'),
+                    ('Total Applications', dashboard_data['pending_applications'], 'assignment', '#10b981', '+8% from last month'),
+                    ('Candidates', dashboard_data['candidates_count'], 'group', '#f59e0b', '5 new this week'),
+                    ('Response Rate', '85%', 'trending_up', '#8b5cf6', '+3% improvement'),
+                ]
                 
-                # Total Applications Card
-                with ui.card().classes('glass-card flex-1'):
-                    ui.label('Total Applications').classes('text-gray-600 text-sm font-medium mb-2')
-                    ui.label(str(dashboard_data['pending_applications'])).classes('text-4xl font-bold brand-primary mb-1')
-                    ui.label('Awaiting review').classes('text-xs text-gray-500')
-                
-                # Candidates Viewed Card
-                with ui.card().classes('glass-card flex-1'):
-                    ui.label('Candidates').classes('text-gray-600 text-sm font-medium mb-2')
-                    ui.label(str(dashboard_data['candidates_count'])).classes('text-4xl font-bold brand-primary mb-1')
-                    ui.label('In your pipeline').classes('text-xs text-gray-500')
+                for label, value, icon, color, trend in metrics:
+                    with ui.card().classes('metric-card'):
+                        with ui.row().classes('items-start justify-between w-full'):
+                            with ui.column().classes('gap-0 flex-1'):
+                                ui.label(label).classes('metric-label')
+                                ui.label(str(value)).classes('metric-value').style(f'color: {color} !important;')
+                                ui.label(trend).classes('metric-trend')
+                            ui.icon(icon, size='24px').style(f'color: {color} !important; opacity: 0.3;')
             
-            # Recent Activity (as table)
-            with ui.card().classes('glass-card p-0 mb-6'):
-                with ui.element('div').classes('px-6 py-4'):
-                    ui.label('Recent Job Postings').classes('text-xl font-semibold brand-charcoal')
+            # Recent Job Postings Section
+            with ui.card().classes('pro-card').style('margin-top: 8px;'):
+                with ui.row().classes('items-center justify-between w-full').style('margin-bottom: 16px;'):
+                    with ui.column().classes('gap-0'):
+                        ui.label('Recent Job Postings').style('font-size: 16px; font-weight: 700; color: #0f172a;')
+                        ui.label(f'{dashboard_data["active_postings"]} active postings').style('font-size: 11px; color: #64748b;')
+                
+                # Job Postings Overview Table
                 if dashboard_data['job_postings']:
-                    with ui.element('table').classes('w-full'):
-                        with ui.element('thead'):
-                            with ui.element('tr'):
-                                for h in ['Title', 'Location', 'Type', 'Status', 'Applications', 'Posted']:
-                                    with ui.element('th'):
-                                        ui.label(h)
-                        with ui.element('tbody'):
-                            for job in dashboard_data['job_postings'][:5]:
+                    with ui.element('div').classes('table-container'):
+                        with ui.element('table').classes('overview-table'):
+                            with ui.element('thead'):
                                 with ui.element('tr'):
-                                    with ui.element('td'):
-                                        ui.label(job.get('title', 'Job Title'))
-                                    with ui.element('td'):
-                                        ui.label(job.get('location', 'Location'))
-                                    with ui.element('td'):
-                                        ui.label(job.get('type', 'Full-time'))
-                                    with ui.element('td'):
-                                        ui.label((job.get('status') or 'active').upper())
-                                    with ui.element('td'):
-                                        ui.label(str(job.get('applications', 0)))
-                                    with ui.element('td'):
-                                        ui.label(job.get('postedDate', ''))
+                                    for h in ['Title', 'Location', 'Type', 'Status', 'Applications', 'Posted']:
+                                        with ui.element('th'):
+                                            ui.label(h)
+                            with ui.element('tbody'):
+                                for job in dashboard_data['job_postings'][:5]:
+                                    with ui.element('tr'):
+                                        with ui.element('td'):
+                                            ui.label(job.get('title', 'Job Title'))
+                                        with ui.element('td'):
+                                            ui.label(job.get('location', 'Location'))
+                                        with ui.element('td'):
+                                            ui.label(job.get('type', 'Full-time'))
+                                        with ui.element('td'):
+                                            ui.label((job.get('status') or 'active').upper())
+                                        with ui.element('td'):
+                                            ui.label(str(job.get('applications', 0)))
+                                        with ui.element('td'):
+                                            ui.label(job.get('postedDate', ''))
                 else:
                     with ui.column().classes('items-center py-12 gap-4'):
                         ui.label('No job postings yet').classes('text-gray-500 text-lg')
@@ -416,15 +788,28 @@ def modern_employer_dashboard():
                                  on_click=lambda: navigate_to_section('postings')).classes('btn-primary')
             
             # Quick Actions
-            with ui.card().classes('glass-card'):
-                ui.label('Quick Actions').classes('text-xl font-semibold brand-charcoal mb-4')
-                with ui.row().classes('gap-4'):
-                    ui.button('Post a New Job', 
-                             on_click=lambda: ui.notify('Job posting form coming soon!')).classes('btn-primary')
-                    ui.button('Browse Candidates', 
-                             on_click=lambda: navigate_to_section('candidates')).classes('btn-secondary')
-                    ui.button('Update Company Profile', 
-                             on_click=lambda: ui.navigate.to('/employer/onboarding/profile')).classes('btn-secondary')
+            with ui.card().classes('pro-card').style('margin-top: 16px;'):
+                ui.label('Quick Actions').style('font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 16px;')
+                
+                # Action buttons with icons
+                with ui.row().classes('gap-3 w-full').style('flex-wrap: wrap;'):
+                    # Post a New Job - Primary Action
+                    with ui.element('div').classes('action-button-primary').on('click', lambda: navigate_to_section('postings')):
+                        with ui.row().classes('items-center gap-2'):
+                            ui.icon('add_circle', size='20px')
+                            ui.label('Post a New Job')
+                    
+                    # Browse Candidates
+                    with ui.element('div').classes('action-button-secondary').on('click', lambda: navigate_to_section('candidates')):
+                        with ui.row().classes('items-center gap-2'):
+                            ui.icon('group', size='20px')
+                            ui.label('Browse Candidates')
+                    
+                    # Update Company Profile
+                    with ui.element('div').classes('action-button-secondary').on('click', lambda: ui.navigate.to('/employer/onboarding/profile')):
+                        with ui.row().classes('items-center gap-2'):
+                            ui.icon('business', size='20px')
+                            ui.label('Company Profile')
         
         def render_job_postings():
             """Render job postings section."""
@@ -472,9 +857,12 @@ def modern_employer_dashboard():
                 navigate_to_section('postings')
             
             with ui.row().classes('w-full items-center justify-between mb-2'):
-                ui.label('Job Postings').classes('section-header')
-                ui.button('Create New Job' if not show_create_form['visible'] else 'View Job List', 
-                         on_click=toggle_create_form).classes('btn-primary')
+                ui.label('Job Postings').style('font-size: 20px; font-weight: 800; color: #0f172a;')
+                # Brand-compliant action button
+                with ui.element('div').classes('action-button-primary').on('click', toggle_create_form):
+                    with ui.row().classes('items-center gap-2'):
+                        ui.icon('add_circle' if not show_create_form['visible'] else 'list', size='20px')
+                        ui.label('Create New Job' if not show_create_form['visible'] else 'View Job List')
             
             # Show create form if visible
             if show_create_form['visible']:
@@ -533,36 +921,37 @@ def modern_employer_dashboard():
             if page_rows:
                 # Render as a brand-styled table
                 with ui.card().classes('glass-card p-0'):
-                    with ui.element('table').classes('w-full'):
-                        # Table Header
-                        with ui.element('thead'):
-                            with ui.element('tr'):
-                                for h in ['Title', 'Location', 'Type', 'Experience', 'Status', 'Applications', 'Posted', 'Actions']:
-                                    with ui.element('th'):
-                                        ui.label(h)
-                        # Table Body
-                        with ui.element('tbody'):
-                            for job in page_rows:
+                    with ui.element('div').classes('table-container'):
+                        with ui.element('table').classes('w-full'):
+                            # Table Header
+                            with ui.element('thead'):
                                 with ui.element('tr'):
-                                    with ui.element('td'):
-                                        ui.label(job.get('title', 'Job Title'))
-                                    with ui.element('td'):
-                                        ui.label(job.get('location', 'Location'))
-                                    with ui.element('td'):
-                                        ui.label(job.get('type', 'Full-time'))
-                                    with ui.element('td'):
-                                        ui.label(job.get('experienceLevel', 'Entry Level'))
-                                    with ui.element('td'):
-                                        ui.label((job.get('status') or 'active').upper())
-                                    with ui.element('td'):
-                                        ui.label(str(job.get('applications', 0)))
-                                    with ui.element('td'):
-                                        ui.label(job.get('postedDate', ''))
-                                    with ui.element('td'):
-                                        with ui.row().classes('gap-2'):
-                                            ui.button('View', on_click=lambda j=job: ui.notify(f"Viewing {j.get('title')}", type='info')).props('flat size=sm')
-                                            ui.button('Edit', on_click=lambda j=job: ui.notify(f"Edit feature coming soon for {j.get('title')}", type='info')).props('flat size=sm')
-                                            ui.button('Close', on_click=lambda j=job: close_job_posting(j.get('id'))).props('flat size=sm color=negative')
+                                    for h in ['Title', 'Location', 'Type', 'Experience', 'Status', 'Applications', 'Posted', 'Actions']:
+                                        with ui.element('th'):
+                                            ui.label(h)
+                            # Table Body
+                            with ui.element('tbody'):
+                                for job in page_rows:
+                                    with ui.element('tr'):
+                                        with ui.element('td'):
+                                            ui.label(job.get('title', 'Job Title'))
+                                        with ui.element('td'):
+                                            ui.label(job.get('location', 'Location'))
+                                        with ui.element('td'):
+                                            ui.label(job.get('type', 'Full-time'))
+                                        with ui.element('td'):
+                                            ui.label(job.get('experienceLevel', 'Entry Level'))
+                                        with ui.element('td'):
+                                            ui.label((job.get('status') or 'active').upper())
+                                        with ui.element('td'):
+                                            ui.label(str(job.get('applications', 0)))
+                                        with ui.element('td'):
+                                            ui.label(job.get('postedDate', ''))
+                                        with ui.element('td'):
+                                            with ui.row().classes('gap-2'):
+                                                ui.button('View', on_click=lambda j=job: ui.notify(f"Viewing {j.get('title')}", type='info')).props('flat size=sm')
+                                                ui.button('Edit', on_click=lambda j=job: ui.notify(f"Edit feature coming soon for {j.get('title')}", type='info')).props('flat size=sm')
+                                                ui.button('Close', on_click=lambda j=job: close_job_posting(j.get('id'))).props('flat size=sm color=negative')
                 # Pagination controls
                 with ui.row().classes('justify-end items-center gap-3 mt-3'):
                     ui.button('Prev', on_click=lambda: (postings_state.update({'page': max(1, postings_state['page']-1)}), navigate_to_section('postings'))).props('outline size=sm')
@@ -570,10 +959,13 @@ def modern_employer_dashboard():
                     ui.button('Next', on_click=lambda: (postings_state.update({'page': min(total_pages, postings_state['page']+1)}), navigate_to_section('postings'))).props('outline size=sm')
             else:
                 with ui.column().classes('items-center py-16 gap-4'):
-                    ui.label('No job postings yet').classes('text-gray-500 text-xl')
-                    ui.label('Create your first job posting to start attracting candidates').classes('text-gray-400')
-                    ui.button('Create Job Posting', 
-                             on_click=toggle_create_form).classes('btn-primary mt-4')
+                    ui.label('No job postings yet').style('font-size: 18px; color: #64748b; font-weight: 600;')
+                    ui.label('Create your first job posting to start attracting candidates').style('font-size: 14px; color: #94a3b8;')
+                    # Brand-compliant action button
+                    with ui.element('div').classes('action-button-primary').on('click', toggle_create_form).style('margin-top: 16px;'):
+                        with ui.row().classes('items-center gap-2'):
+                            ui.icon('add_circle', size='20px')
+                            ui.label('Create Job Posting')
         
         def close_job_posting(job_id):
             """Close/deactivate a job posting."""
@@ -703,29 +1095,30 @@ def modern_employer_dashboard():
             start = (applications_state['page'] - 1) * page_size
             page_rows = filtered[start:start+page_size]
             with ui.card().classes('glass-card p-0'):
-                with ui.element('table').classes('w-full'):
-                    with ui.element('thead'):
-                        with ui.element('tr'):
-                            for h in ['Applicant', 'Job', 'Status', 'Applied On', 'Actions']:
-                                with ui.element('th'):
-                                    ui.label(h)
-                    with ui.element('tbody'):
-                        for app_row in page_rows:
+                with ui.element('div').classes('table-container'):
+                    with ui.element('table').classes('w-full'):
+                        with ui.element('thead'):
                             with ui.element('tr'):
-                                with ui.element('td'):
-                                    ui.label(app_row.get('applicant', ''))
-                                with ui.element('td'):
-                                    ui.label(app_row.get('job', ''))
-                                with ui.element('td'):
-                                    ui.label(app_row.get('status', ''))
-                                with ui.element('td'):
-                                    ui.label(app_row.get('applied', ''))
-                                with ui.element('td'):
-                                    with ui.row().classes('gap-2'):
-                                        ui.button('View', on_click=lambda a=app_row: ui.notify(f"Viewing application: {a.get('applicant')}"))\
-                                            .props('flat size=sm')
-                                        ui.button('Message', on_click=lambda a=app_row: ui.notify(f"Messaging {a.get('applicant')}"))\
-                                            .props('flat size=sm')
+                                for h in ['Applicant', 'Job', 'Status', 'Applied On', 'Actions']:
+                                    with ui.element('th'):
+                                        ui.label(h)
+                        with ui.element('tbody'):
+                            for app_row in page_rows:
+                                with ui.element('tr'):
+                                    with ui.element('td'):
+                                        ui.label(app_row.get('applicant', ''))
+                                    with ui.element('td'):
+                                        ui.label(app_row.get('job', ''))
+                                    with ui.element('td'):
+                                        ui.label(app_row.get('status', ''))
+                                    with ui.element('td'):
+                                        ui.label(app_row.get('applied', ''))
+                                    with ui.element('td'):
+                                        with ui.row().classes('gap-2'):
+                                            ui.button('View', on_click=lambda a=app_row: ui.notify(f"Viewing application: {a.get('applicant')}"))\
+                                                .props('flat size=sm')
+                                            ui.button('Message', on_click=lambda a=app_row: ui.notify(f"Messaging {a.get('applicant')}"))\
+                                                .props('flat size=sm')
             # Pagination controls
             with ui.row().classes('justify-end items-center gap-3 mt-3'):
                 ui.button('Prev', on_click=lambda: (applications_state.update({'page': max(1, applications_state['page']-1)}), navigate_to_section('applications'))).props('outline size=sm')
@@ -742,33 +1135,34 @@ def modern_employer_dashboard():
             ]
             ui.label('Candidates').classes('section-header')
             with ui.card().classes('glass-card p-0'):
-                with ui.element('table').classes('w-full'):
-                    with ui.element('thead'):
-                        with ui.element('tr'):
-                            for h in ['Name', 'Title', 'Location', 'Skills', 'Rating', 'Availability', 'Actions']:
-                                with ui.element('th'):
-                                    ui.label(h)
-                    with ui.element('tbody'):
-                        for c in candidates:
+                with ui.element('div').classes('table-container'):
+                    with ui.element('table').classes('w-full'):
+                        with ui.element('thead'):
                             with ui.element('tr'):
-                                with ui.element('td'):
-                                    ui.label(c.get('name',''))
-                                with ui.element('td'):
-                                    ui.label(c.get('title',''))
-                                with ui.element('td'):
-                                    ui.label(c.get('location',''))
-                                with ui.element('td'):
-                                    ui.label(', '.join(c.get('skills', [])[:5]))
-                                with ui.element('td'):
-                                    ui.label(str(c.get('rating','')))
-                                with ui.element('td'):
-                                    ui.label(c.get('availability',''))
-                                with ui.element('td'):
-                                    with ui.row().classes('gap-2'):
-                                        ui.button('View', on_click=lambda cand=c: ui.notify(f"Viewing {cand.get('name')}"))\
-                                            .props('flat size=sm')
-                                        ui.button('Contact', on_click=lambda cand=c: ui.notify(f"Contacting {cand.get('name')}"))\
-                                            .props('flat size=sm')
+                                for h in ['Name', 'Title', 'Location', 'Skills', 'Rating', 'Availability', 'Actions']:
+                                    with ui.element('th'):
+                                        ui.label(h)
+                        with ui.element('tbody'):
+                            for c in candidates:
+                                with ui.element('tr'):
+                                    with ui.element('td'):
+                                        ui.label(c.get('name',''))
+                                    with ui.element('td'):
+                                        ui.label(c.get('title',''))
+                                    with ui.element('td'):
+                                        ui.label(c.get('location',''))
+                                    with ui.element('td'):
+                                        ui.label(', '.join(c.get('skills', [])[:5]))
+                                    with ui.element('td'):
+                                        ui.label(str(c.get('rating','')))
+                                    with ui.element('td'):
+                                        ui.label(c.get('availability',''))
+                                    with ui.element('td'):
+                                        with ui.row().classes('gap-2'):
+                                            ui.button('View', on_click=lambda cand=c: ui.notify(f"Viewing {cand.get('name')}"))\
+                                                .props('flat size=sm')
+                                            ui.button('Contact', on_click=lambda cand=c: ui.notify(f"Contacting {cand.get('name')}"))\
+                                                .props('flat size=sm')
         
         def render_company_profile():
             """Render company profile section."""
@@ -795,8 +1189,11 @@ def modern_employer_dashboard():
                     ui.label('Location').classes('font-semibold brand-charcoal mb-2')
                     ui.label(f"{employer_profile.get('city', '')}, {employer_profile.get('country', '')}").classes('text-gray-700')
             
-            ui.button('Edit Company Profile', 
-                     on_click=lambda: ui.navigate.to('/employer/onboarding/profile')).classes('btn-primary')
+            # Brand-compliant action button
+            with ui.element('div').classes('action-button-primary').on('click', lambda: ui.navigate.to('/employer/onboarding/profile')):
+                with ui.row().classes('items-center gap-2'):
+                    ui.icon('edit', size='20px')
+                    ui.label('Edit Company Profile')
         
         def render_settings():
             """Render settings section."""
